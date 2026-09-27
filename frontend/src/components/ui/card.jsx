@@ -54,9 +54,9 @@ export function CardFooter({ className, children, ...props }) {
 
 export function Badge({ className, variant = 'default', children, ...props }) {
   const variants = {
-    default: 'bg-primary-900 text-white dark:bg-gold-400 dark:text-primary-950',
-    gold: 'bg-gold-100 text-gold-900 border border-gold-300 dark:bg-gold-950/60 dark:text-gold-200 dark:border-gold-800',
-    outline: 'border border-border text-foreground',
+    default: 'bg-primary-900 text-white',
+    gold: 'bg-gold-100 text-gold-900 border border-gold-300',
+    outline: 'border border-border text-foreground bg-white',
     secondary: 'bg-muted text-muted-foreground'
   };
 

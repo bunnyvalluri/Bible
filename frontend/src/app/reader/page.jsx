@@ -29,6 +29,7 @@ import { CompareModal } from '@/components/reader/CompareModal';
 import { ReaderSettings } from '@/components/reader/ReaderSettings';
 import { VerseActionSheet } from '@/components/reader/VerseActionSheet';
 import { VerseExplanationDrawer } from '@/components/ai/VerseExplanationDrawer';
+import { BibleIllustrationModal } from '@/components/illustration/BibleIllustrationModal';
 
 function ReaderContent() {
   const searchParams = useSearchParams();
@@ -53,6 +54,7 @@ function ReaderContent() {
   const [selectedVerse, setSelectedVerse] = useState(null);
   const [actionSheetOpen, setActionSheetOpen] = useState(false);
   const [explainOpen, setExplainOpen] = useState(false);
+  const [illustrationOpen, setIllustrationOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
   const [highlights, setHighlights] = useState({});
 
@@ -115,9 +117,9 @@ function ReaderContent() {
   const verses = chapterData?.verses || [];
 
   return (
-    <div className="min-h-screen bg-background pb-32">
+    <div className="min-h-screen bg-white pb-32">
       {/* 1. Sticky Reader Header Toolbar */}
-      <div className="sticky top-16 z-30 bg-background/95 backdrop-blur-md border-b border-border py-3 px-4 sm:px-6 lg:px-8">
+      <div className="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-[#E5E7EB] py-3 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
           {/* Book and Chapter Selectors */}
           <div className="flex items-center space-x-2">
@@ -125,7 +127,7 @@ function ReaderContent() {
             <select
               value={currentBook.code}
               onChange={(e) => handleNavigateChapter(e.target.value, 1)}
-              className="bg-card border border-border rounded-xl px-3 py-1.5 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-gold-400 font-serif"
+              className="bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-sm font-semibold text-[#171717] focus:outline-none focus:ring-2 focus:ring-blue-500 font-serif shadow-sm"
             >
               <optgroup label="Old Testament (పాత నిబంధన)">
                 {BIBLE_BOOKS.filter(b => b.testament === 'OT').map(b => (
@@ -147,7 +149,7 @@ function ReaderContent() {
             <select
               value={chapterNumber}
               onChange={(e) => handleNavigateChapter(currentBook.code, parseInt(e.target.value, 10))}
-              className="bg-card border border-border rounded-xl px-3 py-1.5 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-gold-400"
+              className="bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-sm font-semibold text-[#171717] focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
             >
               {Array.from({ length: currentBook.chapters }, (_, i) => i + 1).map(num => (
                 <option key={num} value={num}>
@@ -162,20 +164,20 @@ function ReaderContent() {
             <Button
               variant="outline"
               size="sm"
-              className="h-9 px-2.5 sm:px-3 text-xs flex items-center space-x-1"
+              className="h-9 px-2.5 sm:px-3 text-xs flex items-center space-x-1 border-[#E5E7EB] bg-white text-[#171717] hover:bg-slate-50"
               onClick={handlePlayChapterAudio}
             >
-              <Headphones className="w-4 h-4 text-gold-500" />
+              <Headphones className="w-4 h-4 text-gold-600" />
               <span className="hidden sm:inline">{t('listen')}</span>
             </Button>
 
             <Button
               variant="outline"
               size="sm"
-              className="h-9 px-2.5 sm:px-3 text-xs flex items-center space-x-1"
+              className="h-9 px-2.5 sm:px-3 text-xs flex items-center space-x-1 border-[#E5E7EB] bg-white text-[#171717] hover:bg-slate-50"
               onClick={() => setReadingMode(readingMode === READING_MODES.PARALLEL ? READING_MODES.BOOK : READING_MODES.PARALLEL)}
             >
-              <Columns className="w-4 h-4 text-primary-900 dark:text-gold-400" />
+              <Columns className="w-4 h-4 text-[#163A5F]" />
               <span className="hidden sm:inline">
                 {readingMode === READING_MODES.PARALLEL ? 'Single View' : 'Parallel'}
               </span>
@@ -184,11 +186,11 @@ function ReaderContent() {
             <Button
               variant="outline"
               size="icon"
-              className="w-9 h-9"
+              className="w-9 h-9 border-[#E5E7EB] bg-white text-[#171717] hover:bg-slate-50"
               onClick={() => setSettingsOpen(true)}
               title="Reader Settings"
             >
-              <SlidersHorizontal className="w-4 h-4" />
+              <SlidersHorizontal className="w-4 h-4 text-[#163A5F]" />
             </Button>
           </div>
         </div>
@@ -196,23 +198,23 @@ function ReaderContent() {
 
       {/* 2. Reader Book Paper Surface */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <div className="book-paper rounded-3xl p-6 sm:p-12 border border-border/80 min-h-[600px] space-y-8 animate-in fade-in duration-300">
+        <div className="bg-white rounded-3xl p-6 sm:p-12 border border-[#E5E7EB] shadow-sm min-h-[600px] space-y-8 animate-in fade-in duration-300">
           {/* Chapter Heading */}
-          <div className="text-center space-y-2 border-b border-border/60 pb-6">
-            <span className="text-xs uppercase tracking-widest text-gold-600 dark:text-gold-400 font-serif font-semibold">
+          <div className="text-center space-y-2 border-b border-[#E5E7EB] pb-6">
+            <span className="text-xs uppercase tracking-widest text-gold-600 font-serif font-semibold">
               {currentBook.category} • {currentBook.testament === 'OT' ? t('ot') : t('nt')}
             </span>
-            <h1 className="text-3xl sm:text-4xl font-bold font-serif text-primary-950 dark:text-gold-200">
+            <h1 className="text-3xl sm:text-4xl font-bold font-serif text-[#163A5F]">
               {bookName} {chapterNumber}
             </h1>
-            <p className="text-xs text-muted-foreground font-serif italic">
+            <p className="text-xs text-[#737373] font-serif italic">
               {currentBook.english} {chapterNumber} • {verses.length} Verses
             </p>
           </div>
 
           {/* Reading Mode Rendering */}
           {loading ? (
-            <div className="py-24 text-center text-muted-foreground text-sm space-y-2">
+            <div className="py-24 text-center text-[#737373] text-sm space-y-2">
               <div className="w-8 h-8 rounded-full border-2 border-gold-500 border-t-transparent animate-spin mx-auto" />
               <p>Loading Scripture...</p>
             </div>
@@ -239,12 +241,12 @@ function ReaderContent() {
 
           {/* 3. Bottom Chapter Navigation */}
           {chapterData?.navigation && (
-            <div className="flex items-center justify-between pt-8 border-t border-border/80">
+            <div className="flex items-center justify-between pt-8 border-t border-[#E5E7EB]">
               {chapterData.navigation.prev ? (
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-xl flex items-center space-x-1"
+                  className="rounded-xl flex items-center space-x-1 border-[#E5E7EB] bg-white text-[#171717] hover:bg-slate-50"
                   onClick={() => handleNavigateChapter(chapterData.navigation.prev.bookCode, chapterData.navigation.prev.chapterNumber)}
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -252,15 +254,15 @@ function ReaderContent() {
                 </Button>
               ) : <div />}
 
-              <span className="text-xs font-serif text-muted-foreground">
+              <span className="text-xs font-serif text-[#737373]">
                 {chapterNumber} of {currentBook.chapters}
               </span>
 
               {chapterData.navigation.next ? (
                 <Button
-                  variant="gold"
+                  variant="default"
                   size="sm"
-                  className="rounded-xl flex items-center space-x-1"
+                  className="rounded-xl flex items-center space-x-1 bg-[#163A5F] hover:bg-[#0f2842] text-white"
                   onClick={() => handleNavigateChapter(chapterData.navigation.next.bookCode, chapterData.navigation.next.chapterNumber)}
                 >
                   <span>{t('next_chapter')}</span>
@@ -299,10 +301,24 @@ function ReaderContent() {
         onOpenArtwork={(v, ref, text) => {
           router.push(`/artwork?verseText=${encodeURIComponent(text)}&reference=${encodeURIComponent(ref)}`);
         }}
+        onOpenIllustration={(v, ref, text) => {
+          if (v) setSelectedVerse(v);
+          setIllustrationOpen(true);
+        }}
         onHighlightChange={(vKey, color) => {
           setHighlights(prev => ({ ...prev, [vKey]: color }));
         }}
       />
+
+      {/* Bible Visual Illustration Modal */}
+      {selectedVerse && (
+        <BibleIllustrationModal
+          verse={selectedVerse}
+          bookName={bookName}
+          isOpen={illustrationOpen}
+          onClose={() => setIllustrationOpen(false)}
+        />
+      )}
 
       {/* AI Explanation Drawer */}
       {selectedVerse && (

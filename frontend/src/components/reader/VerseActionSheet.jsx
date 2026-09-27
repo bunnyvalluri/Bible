@@ -21,7 +21,6 @@ import {
   Headphones,
   Copy,
   Check,
-  Share2,
   X
 } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -35,6 +34,7 @@ export function VerseActionSheet({
   onClose,
   onOpenExplain,
   onOpenArtwork,
+  onOpenIllustration,
   onHighlightChange
 }) {
   const { language, t } = useI18n();
@@ -110,100 +110,113 @@ export function VerseActionSheet({
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-      <div className="w-full max-w-xl bg-card border border-border rounded-3xl p-6 shadow-2xl space-y-4 animate-in slide-in-from-bottom-6">
+    <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in">
+      <div className="w-full max-w-xl bg-white border border-[#E5E7EB] rounded-3xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.15)] space-y-4 animate-in slide-in-from-bottom-6">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border pb-3">
+        <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-gold-600 dark:text-gold-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#163A5F]">
               Verse Selected
             </span>
-            <h4 className="text-base font-bold font-serif text-foreground">{reference}</h4>
+            <h4 className="text-base font-bold font-serif text-[#171717]">{reference}</h4>
           </div>
-          <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full" onClick={onClose}>
+          <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full text-[#737373] hover:text-[#171717]" onClick={onClose}>
             <X className="w-4 h-4" />
           </Button>
         </div>
 
         {/* Verse Text Snippet */}
-        <p className="text-sm font-serif italic text-muted-foreground leading-relaxed line-clamp-2">
+        <p className="text-sm font-serif italic text-[#525252] leading-relaxed line-clamp-2">
           "{verseText}"
         </p>
 
         {/* Action Grid */}
-        <div className="grid grid-cols-4 gap-2 pt-2">
+        <div className="grid grid-cols-5 gap-2 pt-2">
           <Button
-            variant="gold"
+            variant="default"
             size="sm"
-            className="flex flex-col items-center justify-center h-16 py-1 gap-1 text-[11px]"
+            className="flex flex-col items-center justify-center h-16 py-1 gap-1 text-[11px] bg-[#163A5F] hover:bg-[#0f2742] text-white shadow-sm"
             onClick={() => {
               onClose();
               onOpenExplain(verse, reference, verseText);
             }}
           >
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="w-4 h-4 text-[#C9A227]" />
             <span>{t('ai_explanation')}</span>
           </Button>
 
           <Button
             variant="outline"
             size="sm"
-            className="flex flex-col items-center justify-center h-16 py-1 gap-1 text-[11px]"
+            className="flex flex-col items-center justify-center h-16 py-1 gap-1 text-[11px] border-[#E5E7EB] hover:bg-[#F8FAFC] text-[#163A5F]"
+            onClick={() => {
+              onClose();
+              if (onOpenIllustration) onOpenIllustration(verse, reference, verseText);
+            }}
+          >
+            <Sparkles className="w-4 h-4 text-[#C9A227]" />
+            <span>Illustration</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex flex-col items-center justify-center h-16 py-1 gap-1 text-[11px] border-[#E5E7EB] hover:bg-[#F8FAFC] text-[#171717]"
             onClick={handleToggleBookmark}
           >
-            {bookmarked ? <BookmarkCheck className="w-4 h-4 text-gold-500" /> : <Bookmark className="w-4 h-4" />}
+            {bookmarked ? <BookmarkCheck className="w-4 h-4 text-[#C9A227]" /> : <Bookmark className="w-4 h-4 text-[#737373]" />}
             <span>{bookmarked ? t('bookmarked') : t('bookmark')}</span>
           </Button>
 
           <Button
             variant="outline"
             size="sm"
-            className="flex flex-col items-center justify-center h-16 py-1 gap-1 text-[11px]"
+            className="flex flex-col items-center justify-center h-16 py-1 gap-1 text-[11px] border-[#E5E7EB] hover:bg-[#F8FAFC] text-[#171717]"
             onClick={() => {
               onClose();
               onOpenArtwork(verse, reference, verseText);
             }}
           >
-            <Palette className="w-4 h-4 text-purple-500" />
+            <Palette className="w-4 h-4 text-purple-600" />
             <span>{t('create_artwork')}</span>
           </Button>
 
           <Button
             variant="outline"
             size="sm"
-            className="flex flex-col items-center justify-center h-16 py-1 gap-1 text-[11px]"
+            className="flex flex-col items-center justify-center h-16 py-1 gap-1 text-[11px] border-[#E5E7EB] hover:bg-[#F8FAFC] text-[#171717]"
             onClick={handlePlayAudio}
           >
-            <Headphones className="w-4 h-4 text-sky-500" />
+            <Headphones className="w-4 h-4 text-sky-600" />
             <span>{t('listen')}</span>
           </Button>
         </div>
 
         {/* Secondary Bar: Highlights, Note, Copy */}
-        <div className="flex items-center justify-between pt-2 border-t border-border">
+        <div className="flex items-center justify-between pt-3 border-t border-[#E5E7EB]">
           {/* Highlight Color Pickers */}
           <div className="flex items-center space-x-1.5">
-            <Highlighter className="w-3.5 h-3.5 text-muted-foreground mr-1" />
+            <Highlighter className="w-3.5 h-3.5 text-[#737373] mr-1" />
             {HIGHLIGHT_COLORS.map((col) => (
               <button
                 key={col.id}
                 onClick={() => handleHighlightSelect(col.id)}
                 className={`w-6 h-6 rounded-full border-2 transition-transform ${
-                  col.id === 'gold' ? 'bg-amber-400' :
-                  col.id === 'emerald' ? 'bg-emerald-400' :
-                  col.id === 'sapphire' ? 'bg-sky-400' :
-                  col.id === 'ruby' ? 'bg-rose-400' : 'bg-purple-400'
-                } ${currentColor === col.id ? 'scale-125 border-foreground' : 'border-transparent hover:scale-110'}`}
+                  col.id === 'gold' ? 'bg-amber-300' :
+                  col.id === 'emerald' ? 'bg-emerald-300' :
+                  col.id === 'sapphire' ? 'bg-sky-300' :
+                  col.id === 'ruby' ? 'bg-rose-300' : 'bg-purple-300'
+                } ${currentColor === col.id ? 'scale-125 border-[#171717]' : 'border-transparent hover:scale-110'}`}
                 title={col.name}
               />
             ))}
           </div>
 
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs h-8"
+              className="text-xs h-8 text-[#525252] hover:text-[#171717]"
               onClick={() => setNoteOpen(!noteOpen)}
             >
               <FileText className="w-3.5 h-3.5 mr-1" />
@@ -213,10 +226,10 @@ export function VerseActionSheet({
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs h-8"
+              className="text-xs h-8 text-[#525252] hover:text-[#171717]"
               onClick={handleCopy}
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-500 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
               {copied ? t('copied') : t('copy')}
             </Button>
           </div>
@@ -229,11 +242,11 @@ export function VerseActionSheet({
               value={noteText}
               onChange={(e) => setNoteText(e.target.value)}
               placeholder="Write personal reflection or study notes in Markdown..."
-              className="w-full h-24 p-3 rounded-xl bg-muted/40 border border-border text-sm focus:outline-none focus:ring-1 focus:ring-gold-400"
+              className="w-full h-24 p-3 rounded-xl bg-[#F8FAFC] border border-[#E5E7EB] text-sm text-[#171717] focus:outline-none focus:ring-1 focus:ring-[#163A5F]"
             />
             <div className="flex justify-end space-x-2">
               <Button variant="ghost" size="sm" onClick={() => setNoteOpen(false)}>Cancel</Button>
-              <Button variant="gold" size="sm" onClick={handleSaveNote}>Save Note</Button>
+              <Button variant="default" size="sm" className="bg-[#163A5F] text-white" onClick={handleSaveNote}>Save Note</Button>
             </div>
           </div>
         )}

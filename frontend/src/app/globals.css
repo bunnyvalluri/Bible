@@ -6,65 +6,35 @@
 
 @layer base {
   :root {
-    --background: 40 25% 97%; /* #faf7f2 warm cream */
-    --foreground: 224 71% 8%; /* #0c1a38 deep navy */
+    --background: 0 0% 100%; /* #FFFFFF pure white */
+    --foreground: 0 0% 9%; /* #171717 deep black */
 
-    --card: 0 0% 100%;
-    --card-foreground: 224 71% 8%;
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 8%;
+    --popover-foreground: 0 0% 9%;
 
-    --primary: 224 71% 14%; /* Deep Royal Navy */
+    --primary: 212 63% 23%; /* #163A5F deep royal blue */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 42 63% 53%; /* Gold #d4af37 */
-    --secondary-foreground: 224 71% 10%;
+    --secondary: 45 68% 47%; /* #C9A227 brand gold */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 38 20% 92%;
-    --muted-foreground: 220 15% 45%;
+    --muted: 210 40% 98%; /* #F8FAFC light surface */
+    --muted-foreground: 0 0% 45%; /* #737373 */
 
-    --accent: 42 63% 92%;
-    --accent-foreground: 42 70% 25%;
+    --accent: 47 73% 88%; /* #F7EFCB light gold */
+    --accent-foreground: 212 63% 23%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 84% 60%; /* #DC2626 */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 38 20% 88%;
-    --input: 38 20% 88%;
-    --ring: 42 63% 53%;
+    --border: 220 13% 91%; /* #E5E7EB */
+    --input: 220 13% 91%;
+    --ring: 212 63% 23%;
 
     --radius: 0.75rem;
-  }
-
-  .dark {
-    --background: 224 71% 6%; /* #070e20 night navy */
-    --foreground: 40 20% 95%;
-
-    --card: 224 60% 9%;
-    --card-foreground: 40 20% 95%;
-
-    --popover: 224 60% 9%;
-    --popover-foreground: 40 20% 95%;
-
-    --primary: 42 63% 53%; /* Gold accent in dark mode */
-    --primary-foreground: 224 71% 8%;
-
-    --secondary: 224 50% 18%;
-    --secondary-foreground: 40 20% 95%;
-
-    --muted: 224 50% 14%;
-    --muted-foreground: 220 15% 65%;
-
-    --accent: 224 50% 16%;
-    --accent-foreground: 42 63% 65%;
-
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 224 50% 16%;
-    --input: 224 50% 16%;
-    --ring: 42 63% 53%;
   }
 }
 
@@ -72,10 +42,78 @@
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground antialiased selection:bg-gold-300 selection:text-primary-900;
-    font-feature-settings: "rlig" 1, "calt" 1;
+  html {
+    background-color: #ffffff !important;
+    color: #171717 !important;
+    color-scheme: light !important;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
   }
+  body {
+    background-color: #ffffff !important;
+    color: #171717 !important;
+    @apply antialiased selection:bg-gold-100 selection:text-primary-950;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+}
+
+/* Fluid Responsive Typography & Safe Area Utilities */
+.text-fluid-hero {
+  font-size: clamp(1.75rem, 5vw + 1rem, 3.75rem);
+  line-height: 1.15;
+}
+
+.text-fluid-h1 {
+  font-size: clamp(1.5rem, 3.5vw + 0.5rem, 2.75rem);
+  line-height: 1.2;
+}
+
+.text-fluid-h2 {
+  font-size: clamp(1.25rem, 2.5vw + 0.5rem, 2rem);
+  line-height: 1.25;
+}
+
+.text-fluid-body {
+  font-size: clamp(0.95rem, 1vw + 0.5rem, 1.2rem);
+  line-height: 1.7;
+}
+
+.text-fluid-reader {
+  font-size: clamp(1.1rem, 1.25vw + 0.6rem, 1.45rem);
+  line-height: 1.85;
+}
+
+/* Safe Area Inset Classes */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.pl-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+.pr-safe {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Touch Target Minimum (44x44px - 48x48px) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive Table & Code Horizontal Scroll Container */
+.responsive-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Custom Scrollbars */
@@ -87,46 +125,34 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/40 transition-colors;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
 }
 
-/* Book Paper Texture & Aesthetics */
+/* White Digital Bible Book Paper Aesthetics */
 .book-paper {
-  background-color: #faf7f2;
+  background-color: #ffffff;
   box-shadow: 
-    0 1px 3px rgba(0,0,0,0.05),
-    0 10px 25px -5px rgba(12,26,56,0.08),
-    inset 0 0 40px rgba(212,175,55,0.03);
-}
-
-.dark .book-paper {
-  background-color: #0b1329;
-  box-shadow: 
-    0 1px 3px rgba(0,0,0,0.4),
-    0 10px 25px -5px rgba(0,0,0,0.6),
-    inset 0 0 40px rgba(212,175,55,0.02);
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 8px 24px -4px rgba(22, 58, 95, 0.05);
 }
 
 /* Gold Gradient Text */
 .text-gold-gradient {
-  background: linear-gradient(135deg, #e4c158 0%, #d4af37 50%, #9f751c 100%);
+  background: linear-gradient(135deg, #b8860b 0%, #c9a227 50%, #996515 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Glassmorphism */
+/* Clean White Glassmorphism */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(212, 175, 55, 0.15);
-}
-
-.dark .glass-panel {
-  background: rgba(11, 19, 41, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(212, 175, 55, 0.12);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 /* Verse Number Badge */

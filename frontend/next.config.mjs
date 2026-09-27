@@ -15,6 +15,14 @@ const nextConfig = {
       { protocol: 'https', hostname: 'assets.mixkit.co' }
     ]
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:5000/api/:path*'
+      }
+    ];
+  },
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,

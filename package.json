@@ -6,7 +6,8 @@
   "workspaces": [
     "frontend",
     "backend",
-    "shared"
+    "shared",
+    "ai-engine"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
@@ -17,7 +18,8 @@
     "db:generate": "prisma generate --schema=database/schema.prisma",
     "db:push": "prisma db push --schema=database/schema.prisma",
     "db:seed": "node scripts/importBible.js",
-    "test": "node --test backend/tests/*.test.js"
+    "test": "node --test backend/tests/*.test.js && node --test ai-engine/tests/*.test.js",
+    "test:ai": "node --test ai-engine/tests/*.test.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

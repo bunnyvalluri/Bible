@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
-import { useTheme } from 'next-themes';
 import {
   BookOpen,
   Search,
@@ -14,9 +13,6 @@ import {
   Palette,
   Headphones,
   Shield,
-  Sun,
-  Moon,
-  Globe,
   Wifi,
   WifiOff,
   Menu,
@@ -27,13 +23,10 @@ import { Button } from '../ui/button';
 export function Navbar() {
   const pathname = usePathname();
   const { language, setLanguage, t } = useI18n();
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     setIsOnline(typeof navigator !== 'undefined' ? navigator.onLine : true);
 
     const handleOnline = () => setIsOnline(true);
@@ -60,18 +53,18 @@ export function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/80 glass-panel">
+    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-[#E5E7EB] shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center space-x-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary-900 to-primary-700 dark:from-gold-600 dark:to-gold-400 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-            <BookOpen className="w-5 h-5 text-gold-300 dark:text-primary-950" />
+          <div className="w-10 h-10 rounded-xl bg-[#163A5F] flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+            <BookOpen className="w-5 h-5 text-[#C9A227]" />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-lg leading-tight tracking-tight text-primary-900 dark:text-gold-300 font-serif">
+            <span className="font-bold text-lg leading-tight tracking-tight text-[#163A5F] font-serif">
               వచనం • Vachanam
             </span>
-            <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+            <span className="text-[10px] text-[#737373] font-medium uppercase tracking-wider">
               {language === 'te' ? 'పరిశుద్ధ గ్రంథము' : language === 'hi' ? 'पवित्र बाइबिल' : 'Holy Bible Engine'}
             </span>
           </div>
@@ -81,28 +74,28 @@ export function Navbar() {
         <nav className="hidden lg:flex items-center space-x-1">
           {navLinks.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href + '/'));
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
                   isActive
-                    ? 'bg-primary-900/10 dark:bg-gold-400/15 text-primary-900 dark:text-gold-300 font-semibold'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                    ? 'bg-[#163A5F]/10 text-[#163A5F] font-semibold'
+                    : 'text-[#525252] hover:text-[#171717] hover:bg-[#F8FAFC]'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-gold-500 dark:text-gold-400' : ''}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-[#163A5F]' : 'text-[#737373]'}`} />
                 <span>{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        {/* Right Controls: Language, Theme, Status */}
-        <div className="hidden sm:flex items-center space-x-2">
+        {/* Right Controls: Online Status & Language Switcher */}
+        <div className="hidden sm:flex items-center space-x-3">
           {/* Offline / Online indicator */}
-          <div className="flex items-center space-x-1 text-xs px-2.5 py-1 rounded-full bg-muted/70 text-muted-foreground" title={isOnline ? 'Online' : 'Offline PWA Active'}>
+          <div className="flex items-center space-x-1.5 text-xs px-2.5 py-1 rounded-full bg-[#F8FAFC] border border-[#E5E7EB] text-[#525252]" title={isOnline ? 'Online' : 'Offline PWA Active'}>
             {isOnline ? (
               <>
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -111,19 +104,19 @@ export function Navbar() {
             ) : (
               <>
                 <WifiOff className="w-3.5 h-3.5 text-amber-500" />
-                <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400">Offline</span>
+                <span className="text-[11px] font-medium text-amber-600">Offline</span>
               </>
             )}
           </div>
 
           {/* Language Switcher */}
-          <div className="flex items-center bg-muted/80 rounded-xl p-0.5 border border-border">
+          <div className="flex items-center bg-[#F8FAFC] rounded-xl p-0.5 border border-[#E5E7EB]">
             <button
               onClick={() => setLanguage('te')}
               className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
                 language === 'te'
-                  ? 'bg-primary-900 text-white dark:bg-gold-400 dark:text-primary-950 font-bold shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-[#163A5F] text-white font-bold shadow-sm'
+                  : 'text-[#525252] hover:text-[#171717]'
               }`}
             >
               తెలుగు
@@ -132,8 +125,8 @@ export function Navbar() {
               onClick={() => setLanguage('en')}
               className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
                 language === 'en'
-                  ? 'bg-primary-900 text-white dark:bg-gold-400 dark:text-primary-950 font-bold shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-[#163A5F] text-white font-bold shadow-sm'
+                  : 'text-[#525252] hover:text-[#171717]'
               }`}
             >
               EN
@@ -142,38 +135,20 @@ export function Navbar() {
               onClick={() => setLanguage('hi')}
               className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
                 language === 'hi'
-                  ? 'bg-primary-900 text-white dark:bg-gold-400 dark:text-primary-950 font-bold shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-[#163A5F] text-white font-bold shadow-sm'
+                  : 'text-[#525252] hover:text-[#171717]'
               }`}
             >
               हिंदी
             </button>
           </div>
-
-          {/* Theme Switcher */}
-          {mounted && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-xl w-9 h-9"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? (
-                <Sun className="w-4 h-4 text-gold-400" />
-              ) : (
-                <Moon className="w-4 h-4 text-primary-900" />
-              )}
-            </Button>
-          )}
         </div>
 
         {/* Mobile menu toggle */}
         <div className="flex items-center space-x-2 lg:hidden">
-          {/* Mobile Language button */}
           <button
             onClick={() => setLanguage(language === 'te' ? 'en' : language === 'en' ? 'hi' : 'te')}
-            className="px-2.5 py-1 text-xs font-bold rounded-lg bg-muted text-primary-900 dark:text-gold-300 border border-border"
+            className="px-2.5 py-1 text-xs font-bold rounded-lg bg-[#F8FAFC] text-[#163A5F] border border-[#E5E7EB]"
           >
             {language === 'te' ? 'తెలుగు' : language === 'hi' ? 'हिंदी' : 'EN'}
           </button>
@@ -181,7 +156,7 @@ export function Navbar() {
           <Button
             variant="ghost"
             size="icon"
-            className="w-9 h-9"
+            className="w-9 h-9 text-[#171717]"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -191,7 +166,7 @@ export function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-border bg-card px-4 pt-2 pb-6 space-y-2 animate-in slide-in-from-top-4">
+        <div className="lg:hidden border-t border-[#E5E7EB] bg-white px-4 pt-2 pb-6 space-y-2 animate-in slide-in-from-top-4 shadow-lg">
           <div className="grid grid-cols-2 gap-2 pt-2">
             {navLinks.map((item) => {
               const Icon = item.icon;
@@ -203,8 +178,8 @@ export function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center space-x-2 px-3 py-2.5 rounded-xl text-sm font-medium ${
                     isActive
-                      ? 'bg-primary-900 text-white dark:bg-gold-400 dark:text-primary-950 font-bold'
-                      : 'bg-muted/40 text-foreground'
+                      ? 'bg-[#163A5F] text-white font-bold'
+                      : 'bg-[#F8FAFC] text-[#171717] hover:bg-[#F1F5F9]'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -212,21 +187,6 @@ export function Navbar() {
                 </Link>
               );
             })}
-          </div>
-
-          <div className="pt-4 flex items-center justify-between border-t border-border mt-3">
-            <span className="text-xs text-muted-foreground">Appearance</span>
-            {mounted && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-xs flex items-center space-x-2"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              >
-                {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-                <span>{theme === 'dark' ? 'Light Theme' : 'Night Theme'}</span>
-              </Button>
-            )}
           </div>
         </div>
       )}

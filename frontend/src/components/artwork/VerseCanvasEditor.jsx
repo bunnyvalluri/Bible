@@ -78,10 +78,10 @@ export function VerseCanvasEditor({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
       {/* Left: Studio Preview Canvas */}
-      <div className="lg:col-span-2 flex flex-col items-center justify-center p-6 bg-muted/20 border border-border rounded-3xl">
+      <div className="lg:col-span-2 flex flex-col items-center justify-center p-6 bg-[#F8FAFC] border border-[#E5E7EB] rounded-3xl">
         <div
           ref={canvasRef}
-          className={`relative w-full ${getAspectClass()} rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between p-8 sm:p-12 text-center transition-all duration-300`}
+          className={`relative w-full ${getAspectClass()} rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between p-8 sm:p-12 text-center transition-all duration-300`}
           style={{
             backgroundImage: `url(${selectedBg})`,
             backgroundSize: 'cover',
@@ -90,17 +90,17 @@ export function VerseCanvasEditor({
         >
           {/* Ambient Overlay */}
           <div
-            className="absolute inset-0 bg-primary-950 transition-opacity"
+            className="absolute inset-0 bg-[#0c1e33] transition-opacity"
             style={{ opacity: overlayOpacity }}
           />
 
           {/* Canvas Decorative Header */}
           <div className="relative z-10 flex items-center justify-center space-x-2">
-            <span className="w-8 h-px bg-gold-400/60" />
+            <span className="w-8 h-px bg-gold-400/80" />
             <span className="text-[11px] font-bold uppercase tracking-widest text-gold-300 font-serif">
               Holy Scripture • పరిశుద్ధ గ్రంథము
             </span>
-            <span className="w-8 h-px bg-gold-400/60" />
+            <span className="w-8 h-px bg-gold-400/80" />
           </div>
 
           {/* Main Verse Text */}
@@ -116,10 +116,10 @@ export function VerseCanvasEditor({
 
           {/* Canvas Reference & Watermark */}
           <div className="relative z-10 flex flex-col items-center space-y-1">
-            <h4 className="text-base sm:text-lg font-bold text-gold-400 tracking-wide font-serif drop-shadow">
+            <h4 className="text-base sm:text-lg font-bold text-gold-300 tracking-wide font-serif drop-shadow">
               {reference}
             </h4>
-            <span className="text-[10px] text-white/70 font-sans tracking-wider">
+            <span className="text-[10px] text-white/80 font-sans tracking-wider">
               VACHANAM (వచనం) BIBLE
             </span>
           </div>
@@ -127,54 +127,54 @@ export function VerseCanvasEditor({
 
         {/* Download & Share Actions */}
         <div className="flex items-center space-x-3 mt-6">
-          <Button variant="gold" size="lg" onClick={handleDownload} disabled={isDownloading}>
+          <Button variant="default" size="lg" className="bg-[#163A5F] hover:bg-[#0f2842] text-white" onClick={handleDownload} disabled={isDownloading}>
             <Download className="w-5 h-5 mr-2" />
             {isDownloading ? 'Generating...' : 'Download High-Res PNG'}
           </Button>
 
-          <Button variant="outline" size="lg" onClick={handleShare}>
-            <Share2 className="w-5 h-5 mr-2" />
+          <Button variant="outline" size="lg" className="border-[#E5E7EB] text-[#171717] bg-white hover:bg-slate-50" onClick={handleShare}>
+            <Share2 className="w-5 h-5 mr-2 text-[#163A5F]" />
             Share
           </Button>
         </div>
       </div>
 
       {/* Right: Studio Customization Panel */}
-      <Card className="p-6 space-y-6">
+      <Card className="p-6 space-y-6 bg-white border-[#E5E7EB] shadow-sm">
         <div>
-          <h3 className="text-lg font-bold font-serif text-foreground">Studio Controls</h3>
-          <p className="text-xs text-muted-foreground">Customize verse artwork typography & backgrounds</p>
+          <h3 className="text-lg font-bold font-serif text-[#163A5F]">Studio Controls</h3>
+          <p className="text-xs text-[#737373]">Customize verse artwork typography & backgrounds</p>
         </div>
 
         {/* Text Input */}
         <div className="space-y-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <label className="text-xs font-bold uppercase tracking-wider text-[#737373]">
             Verse Text
           </label>
           <textarea
             value={verseText}
             onChange={(e) => setVerseText(e.target.value)}
             rows={3}
-            className="w-full p-3 rounded-xl bg-muted/40 border border-border text-sm focus:outline-none focus:ring-1 focus:ring-gold-400"
+            className="w-full p-3 rounded-xl bg-[#F8FAFC] border border-[#E5E7EB] text-sm text-[#171717] focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
 
         {/* Reference Input */}
         <div className="space-y-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <label className="text-xs font-bold uppercase tracking-wider text-[#737373]">
             Reference Citation
           </label>
           <input
             type="text"
             value={reference}
             onChange={(e) => setReference(e.target.value)}
-            className="w-full p-2.5 rounded-xl bg-muted/40 border border-border text-sm focus:outline-none focus:ring-1 focus:ring-gold-400"
+            className="w-full p-2.5 rounded-xl bg-[#F8FAFC] border border-[#E5E7EB] text-sm text-[#171717] focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
 
         {/* Aspect Ratio Presets */}
         <div className="space-y-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <label className="text-xs font-bold uppercase tracking-wider text-[#737373]">
             Format / Aspect Ratio
           </label>
           <div className="grid grid-cols-3 gap-2">
@@ -188,8 +188,8 @@ export function VerseCanvasEditor({
                 onClick={() => setAspectRatio(ar.id)}
                 className={`py-2 text-xs font-semibold rounded-xl border transition-all ${
                   aspectRatio === ar.id
-                    ? 'bg-primary-900 text-white dark:bg-gold-400 dark:text-primary-950 font-bold border-transparent'
-                    : 'border-border hover:bg-muted/40 text-foreground'
+                    ? 'bg-[#163A5F] text-white font-bold border-transparent'
+                    : 'border-[#E5E7EB] bg-white hover:bg-slate-50 text-[#171717]'
                 }`}
               >
                 {ar.label}

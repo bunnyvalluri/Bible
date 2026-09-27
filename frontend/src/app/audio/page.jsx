@@ -35,33 +35,33 @@ export default function AudioBiblePage() {
   const bookName = language === 'te' ? selectedBook.telugu : language === 'hi' ? selectedBook.hindi : selectedBook.english;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 min-h-screen pb-32">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 min-h-screen pb-32 bg-white">
       {/* Header */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-xs font-semibold text-amber-900 dark:text-amber-200">
-          <Headphones className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-900">
+          <Headphones className="w-3.5 h-3.5 text-amber-700" />
           <span>Multilingual Voice Synthesizer</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-foreground">
+        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#163A5F]">
           {t('audio')}
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-[#525252]">
           Listen to clear, narrated scripture recordings in Telugu, English, and Hindi
         </p>
       </div>
 
       {/* Book & Language Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-card border border-border">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-[#F8FAFC] border border-[#E5E7EB]">
         {/* Book Selector */}
         <div className="flex items-center space-x-3">
-          <BookOpen className="w-5 h-5 text-gold-500" />
+          <BookOpen className="w-5 h-5 text-gold-600" />
           <select
             value={selectedBook.code}
             onChange={(e) => {
               const b = BIBLE_BOOKS.find(item => item.code === e.target.value);
               if (b) setSelectedBook(b);
             }}
-            className="bg-muted font-serif font-semibold text-foreground px-4 py-2 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-gold-400"
+            className="bg-white font-serif font-semibold text-[#171717] px-4 py-2 rounded-xl border border-[#E5E7EB] focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
           >
             {BIBLE_BOOKS.map(b => (
               <option key={b.code} value={b.code}>
@@ -72,11 +72,11 @@ export default function AudioBiblePage() {
         </div>
 
         {/* Audio Language Selection */}
-        <div className="flex items-center space-x-1 bg-muted p-1 rounded-xl border border-border">
+        <div className="flex items-center space-x-1 bg-white p-1 rounded-xl border border-[#E5E7EB] shadow-sm">
           <button
             onClick={() => setAudioLang('te')}
             className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-              audioLang === 'te' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+              audioLang === 'te' ? 'bg-[#163A5F] text-white shadow-sm' : 'text-[#737373] hover:text-[#171717]'
             }`}
           >
             తెలుగు
@@ -84,7 +84,7 @@ export default function AudioBiblePage() {
           <button
             onClick={() => setAudioLang('en')}
             className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-              audioLang === 'en' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+              audioLang === 'en' ? 'bg-[#163A5F] text-white shadow-sm' : 'text-[#737373] hover:text-[#171717]'
             }`}
           >
             English
@@ -92,7 +92,7 @@ export default function AudioBiblePage() {
           <button
             onClick={() => setAudioLang('hi')}
             className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-              audioLang === 'hi' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+              audioLang === 'hi' ? 'bg-[#163A5F] text-white shadow-sm' : 'text-[#737373] hover:text-[#171717]'
             }`}
           >
             हिंदी
@@ -102,7 +102,7 @@ export default function AudioBiblePage() {
 
       {/* Chapters Audio Playlist Grid */}
       <div className="space-y-4">
-        <h3 className="text-lg font-serif font-bold text-foreground">
+        <h3 className="text-lg font-serif font-bold text-[#163A5F]">
           {bookName} — Audio Chapters ({selectedBook.chapters})
         </h3>
 
@@ -113,15 +113,15 @@ export default function AudioBiblePage() {
             return (
               <Card
                 key={chNum}
-                className={`p-4 rounded-2xl flex items-center justify-between transition-all ${
+                className={`p-4 rounded-2xl flex items-center justify-between transition-all border-[#E5E7EB] ${
                   isThisTrack
-                    ? 'border-gold-400 bg-gold-50/40 dark:bg-gold-950/30 shadow-md'
-                    : 'hover:border-gold-300 bg-card'
+                    ? 'border-gold-400 bg-[#FEFCE8] shadow-sm'
+                    : 'hover:border-gold-300 bg-white'
                 }`}
               >
                 <div>
-                  <span className="text-xs font-mono text-muted-foreground uppercase">Chapter {chNum}</span>
-                  <h4 className="font-serif font-bold text-sm text-foreground">
+                  <span className="text-xs font-mono text-[#737373] uppercase">Chapter {chNum}</span>
+                  <h4 className="font-serif font-bold text-sm text-[#171717]">
                     {bookName} {chNum}
                   </h4>
                 </div>
@@ -129,7 +129,11 @@ export default function AudioBiblePage() {
                 <Button
                   variant={isThisTrack && isPlaying ? 'gold' : 'outline'}
                   size="icon"
-                  className="w-10 h-10 rounded-full flex-shrink-0"
+                  className={`w-10 h-10 rounded-full flex-shrink-0 ${
+                    isThisTrack && isPlaying
+                      ? 'bg-gold-500 text-white'
+                      : 'border-[#E5E7EB] bg-white text-[#163A5F] hover:bg-slate-50'
+                  }`}
                   onClick={() => {
                     if (isThisTrack) togglePlay();
                     else handlePlayChapter(chNum);

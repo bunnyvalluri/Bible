@@ -16,12 +16,12 @@ export function Button({
   const baseStyles = 'inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]';
 
   const variants = {
-    default: 'bg-primary-900 text-white hover:bg-primary-800 dark:bg-gold-400 dark:text-primary-950 dark:hover:bg-gold-300 shadow-md',
-    gold: 'bg-gradient-to-r from-gold-500 to-gold-400 text-primary-950 font-semibold hover:from-gold-400 hover:to-gold-300 shadow-divine',
-    outline: 'border border-border bg-transparent hover:bg-muted hover:text-foreground',
-    secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+    default: 'bg-primary-900 text-white hover:bg-primary-800 shadow-sm',
+    gold: 'bg-gold-500 text-white font-medium hover:bg-gold-600 shadow-sm',
+    outline: 'border border-border bg-white text-foreground hover:bg-muted hover:text-foreground',
+    secondary: 'bg-slate-100 text-slate-800 hover:bg-slate-200',
     ghost: 'hover:bg-muted/80 text-foreground',
-    glass: 'glass-panel hover:bg-white/90 dark:hover:bg-primary-900/90 text-foreground shadow-sm'
+    glass: 'bg-white/90 border border-border text-foreground hover:bg-white shadow-sm'
   };
 
   const sizes = {

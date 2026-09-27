@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: ['class'],
+  darkMode: 'class', // Controlled explicitly
   content: [
     './src/pages/**/*.{js,jsx}',
     './src/components/**/*.{js,jsx}',
@@ -8,11 +8,27 @@ export default {
     '../packages/ui/**/*.{js,jsx}'
   ],
   theme: {
+    screens: {
+      'xs': '320px',
+      'sm': '480px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1440px',
+      '3xl': '1920px',
+      '4xl': '2560px'
+    },
     container: {
       center: true,
-      padding: '2rem',
+      padding: {
+        DEFAULT: '1rem',
+        sm: '1.5rem',
+        lg: '2rem',
+        xl: '2.5rem',
+        '2xl': '3rem'
+      },
       screens: {
-        '2xl': '1400px'
+        '2xl': '1440px'
       }
     },
     extend: {
@@ -22,63 +38,55 @@ export default {
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        surface: '#ffffff',
+        'light-surface': '#f8fafc',
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
-          50: '#f0f4fd',
-          100: '#dde7fa',
-          200: '#c2d5f7',
-          300: '#99bcf2',
-          400: '#689bea',
-          500: '#437ade',
-          600: '#2f5fc2',
-          700: '#264ca0',
-          800: '#1e3d80',
-          900: '#0c1a38',
-          950: '#070e20'
+          DEFAULT: '#163A5F',
+          foreground: '#ffffff',
+          50: '#f0f6fc',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#2563eb',
+          600: '#1d4ed8',
+          700: '#1e40af',
+          800: '#163A5F',
+          900: '#0f2742',
+          950: '#081524'
         },
         gold: {
-          DEFAULT: '#d4af37',
-          50: '#fbf9ee',
-          100: '#f5f0d3',
-          200: '#ebe0a4',
-          300: '#decb70',
-          400: '#d4af37',
-          500: '#bd9626',
-          600: '#9f751c',
-          700: '#7e5619',
-          800: '#68451a',
-          900: '#583a1b',
-          950: '#341f0b'
-        },
-        cream: {
-          DEFAULT: '#faf7f2',
-          50: '#fdfcf9',
-          100: '#faf7f2',
-          200: '#f4ece1',
-          300: '#ebdccb',
-          400: '#dec4ac',
-          500: '#cca78b'
+          DEFAULT: '#C9A227',
+          50: '#fefce8',
+          100: '#f7efcb',
+          200: '#f5e49c',
+          300: '#ebd367',
+          400: '#dec038',
+          500: '#C9A227',
+          600: '#a6821b',
+          700: '#846317',
+          800: '#6d5019',
+          900: '#5c431a'
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))'
+          DEFAULT: '#C9A227',
+          foreground: '#ffffff'
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))'
+          DEFAULT: '#DC2626',
+          foreground: '#ffffff'
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))'
+          DEFAULT: '#f8fafc',
+          foreground: '#737373'
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))'
+          DEFAULT: '#f7efcb',
+          foreground: '#163A5F'
         },
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))'
+          DEFAULT: '#ffffff',
+          foreground: '#171717'
         }
       },
       fontFamily: {
@@ -89,9 +97,9 @@ export default {
         sans: ['Inter', 'system-ui', 'sans-serif']
       },
       boxShadow: {
-        'divine': '0 20px 40px -15px rgba(212, 175, 55, 0.25)',
-        'book': '0 10px 30px -5px rgba(12, 26, 56, 0.15), 0 0 0 1px rgba(12, 26, 56, 0.05)',
-        'glow': '0 0 30px rgba(212, 175, 55, 0.35)'
+        'subtle': '0 2px 10px rgba(0, 0, 0, 0.04)',
+        'book': '0 4px 20px -2px rgba(22, 58, 95, 0.05), 0 0 0 1px #e5e7eb',
+        'card': '0 4px 20px rgba(0, 0, 0, 0.03)'
       },
       borderRadius: {
         lg: 'var(--radius)',

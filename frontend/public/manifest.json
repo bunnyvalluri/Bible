@@ -4,8 +4,8 @@
   "description": "Premium Multilingual Digital Bible with AI Verse Explanations, Visual Diagrams, Audio & Offline Reading",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0c1a38",
-  "theme_color": "#0c1a38",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
   "icons": [
     {
       "src": "/icons/icon-192.png",

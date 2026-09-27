@@ -48,13 +48,13 @@ export default function ReadingPlansPage() {
   const progressPercent = Math.round((completedDays.length / (activePlan.readings?.length || activePlan.durationDays)) * 100);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 min-h-screen pb-32">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 min-h-screen pb-32 bg-white">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-foreground">
+        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#163A5F]">
           {t('plans')}
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-[#525252]">
           Structured biblical reading plans to enrich your daily walk and spiritual discipline
         </p>
       </div>
@@ -71,24 +71,24 @@ export default function ReadingPlansPage() {
               onClick={() => setActivePlanId(plan.id)}
               className={`cursor-pointer p-5 rounded-3xl border transition-all ${
                 isSelected
-                  ? 'bg-primary-900/10 dark:bg-gold-400/10 border-gold-400 shadow-lg'
-                  : 'bg-card border-border hover:border-gold-300'
+                  ? 'bg-[#EFF6FF] border-[#2563EB] shadow-sm'
+                  : 'bg-white border-[#E5E7EB] hover:border-gold-400'
               }`}
             >
               <div className="flex items-center justify-between">
                 <Badge variant={isSelected ? 'gold' : 'outline'} className="text-[10px]">
                   {plan.category}
                 </Badge>
-                <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                <div className="flex items-center space-x-1 text-xs text-[#737373]">
                   <Clock className="w-3.5 h-3.5" />
                   <span>{plan.durationDays} Days</span>
                 </div>
               </div>
 
-              <h3 className="font-serif font-bold text-base text-foreground mt-3">
+              <h3 className="font-serif font-bold text-base text-[#171717] mt-3">
                 {title}
               </h3>
-              <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+              <p className="text-xs text-[#525252] mt-1 line-clamp-2 leading-relaxed">
                 {plan.description}
               </p>
             </div>
@@ -97,29 +97,29 @@ export default function ReadingPlansPage() {
       </div>
 
       {/* Active Plan Detail & Checklist */}
-      <Card className="border-border shadow-xl bg-card p-6 sm:p-8 space-y-6">
+      <Card className="border-[#E5E7EB] shadow-sm bg-white p-6 sm:p-8 space-y-6">
         {/* Plan Header & Progress Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E7EB] pb-6">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-gold-600 dark:text-gold-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-gold-600">
               Active Spiritual Journey
             </span>
-            <h2 className="text-2xl font-serif font-bold text-foreground mt-1">{planTitle}</h2>
-            <p className="text-xs text-muted-foreground mt-1">{activePlan.description}</p>
+            <h2 className="text-2xl font-serif font-bold text-[#163A5F] mt-1">{planTitle}</h2>
+            <p className="text-xs text-[#525252] mt-1">{activePlan.description}</p>
           </div>
 
           <div className="flex flex-col sm:items-end space-y-2">
             <div className="flex items-center space-x-2">
-              <Award className="w-5 h-5 text-gold-500" />
-              <span className="font-bold text-lg text-foreground">{progressPercent}% Completed</span>
+              <Award className="w-5 h-5 text-gold-600" />
+              <span className="font-bold text-lg text-[#171717]">{progressPercent}% Completed</span>
             </div>
-            <div className="w-full sm:w-48 h-2 bg-muted rounded-full overflow-hidden">
+            <div className="w-full sm:w-48 h-2 bg-slate-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-gold-500 to-amber-400 rounded-full transition-all duration-500"
+                className="h-full bg-gradient-to-r from-gold-500 to-amber-500 rounded-full transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-[11px] text-muted-foreground">
+            <span className="text-[11px] text-[#737373]">
               {completedDays.length} of {activePlan.readings?.length || activePlan.durationDays} days completed
             </span>
           </div>
@@ -137,28 +137,28 @@ export default function ReadingPlansPage() {
                 key={reading.day}
                 className={`p-4 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
                   isCompleted
-                    ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800'
-                    : 'bg-card border-border hover:border-gold-300'
+                    ? 'bg-[#F0FDF4] border-emerald-300'
+                    : 'bg-white border-[#E5E7EB] hover:border-gold-300'
                 }`}
               >
                 {/* Day Number and Title */}
                 <div className="flex items-start space-x-3 min-w-0">
                   <button
                     onClick={() => handleToggleDay(reading.day)}
-                    className="mt-0.5 text-muted-foreground hover:text-emerald-500 transition-colors flex-shrink-0"
+                    className="mt-0.5 text-[#737373] hover:text-emerald-600 transition-colors flex-shrink-0"
                   >
                     {isCompleted ? (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                     ) : (
                       <Circle className="w-5 h-5" />
                     )}
                   </button>
 
                   <div className="min-w-0">
-                    <h4 className={`text-sm font-semibold truncate ${isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                    <h4 className={`text-sm font-semibold truncate ${isCompleted ? 'line-through text-[#737373]' : 'text-[#171717]'}`}>
                       Day {reading.day}: {reading.title}
                     </h4>
-                    <p className="text-xs text-gold-600 dark:text-gold-400 font-mono mt-0.5">
+                    <p className="text-xs text-gold-600 font-mono mt-0.5">
                       {reading.references?.join(', ')}
                     </p>
                   </div>
@@ -166,8 +166,8 @@ export default function ReadingPlansPage() {
 
                 {/* Read Button */}
                 <Link href={`/reader?book=${bCode}&chapter=${ch || 1}`}>
-                  <Button variant="outline" size="sm" className="text-xs rounded-xl h-8 px-3">
-                    <BookOpen className="w-3.5 h-3.5 mr-1" />
+                  <Button variant="outline" size="sm" className="text-xs rounded-xl h-8 px-3 border-[#E5E7EB] bg-white text-[#171717] hover:bg-slate-50">
+                    <BookOpen className="w-3.5 h-3.5 mr-1 text-[#163A5F]" />
                     Read
                   </Button>
                 </Link>

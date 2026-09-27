@@ -57,6 +57,7 @@ model Verse {
   explanations  Explanation[]
   images        VerseImage[]
   audios        Audio[]
+  illustrations Illustration[]
 
   @@index([bookId, chapterNumber, verseNumber])
   @@index([verseKey])
@@ -199,3 +200,78 @@ model ReadingPlan {
   description   String
   createdAt     DateTime @default(now())
 }
+
+model Illustration {
+  id                 Int                      @id @default(autoincrement())
+  verseId            Int?
+  verseKey           String                   // e.g. JHN.3.16
+  language           String                   @default("en") // en, te, hi
+  imageUrl           String
+  thumbnailUrl       String?
+  style              String                   @default("vachanam-editorial-handdrawn")
+  illustrationType   String                   @default("verse") // verse, story, concept, character, historical, youth
+  visualMetaphor     String?
+  theme              String?
+  prompt             String
+  model              String                   @default("vachanam-visual-engine-v1")
+  status             String                   @default("COMPLETED") // PENDING, PROCESSING, COMPLETED, FAILED
+  aspectRatio        String                   @default("16:9")
+  resolution         String                   @default("1920x1080")
+  cloudinaryPublicId String?
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+
+  verse              Verse?                   @relation(fields: [verseId], references: [id], onDelete: Cascade)
+  generations        IllustrationGeneration[]
+  qaReviews          IllustrationQA[]
+
+  @@index([verseKey])
+  @@index([illustrationType])
+  @@index([language])
+}
+
+model IllustrationGeneration {
+  id             Int          @id @default(autoincrement())
+  illustrationId Int
+  provider       String       @default("openai") // openai, stable-diffusion, fallback
+  model          String
+  prompt         String
+  status         String       @default("COMPLETED")
+  errorMessage   String?
+  startedAt      DateTime     @default(now())
+  completedAt    DateTime?
+
+  illustration   Illustration @relation(fields: [illustrationId], references: [id], onDelete: Cascade)
+
+  @@index([illustrationId])
+}
+
+model IllustrationPrompt {
+  id             Int      @id @default(autoincrement())
+  type           String   // verse, story, concept, character, historical, youth, qa
+  version        String   @default("1.0.0")
+  systemPrompt   String
+  templatePrompt String
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([type, version])
+}
+
+model IllustrationQA {
+  id             Int          @id @default(autoincrement())
+  illustrationId Int
+  contentScore   Float        @default(1.0)
+  styleScore     Float        @default(1.0)
+  safetyScore    Float        @default(1.0)
+  accuracyScore  Float        @default(1.0)
+  approved       Boolean      @default(true)
+  feedback       String?
+  createdAt      DateTime     @default(now())
+
+  illustration   Illustration @relation(fields: [illustrationId], references: [id], onDelete: Cascade)
+
+  @@index([illustrationId])
+}
+

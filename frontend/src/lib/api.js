@@ -2,7 +2,9 @@ import axios from 'axios';
 import { getCachedChapter, cacheChapterOffline } from './storage';
 import { BIBLE_BOOKS } from '@vachanam/shared';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = typeof window !== 'undefined'
+  ? '/api'
+  : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api');
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -136,6 +138,29 @@ export const api = {
   async getPlanById(id) {
     const res = await apiClient.get(`/plans/${id}`);
     return res.data.data;
+  },
+
+  // Visual Illustrations
+  async getIllustration(verseKey, lang = 'en', type = 'verse') {
+    const res = await apiClient.get(`/illustrations/${verseKey}`, {
+      params: { lang, type }
+    });
+    return res.data.data;
+  },
+
+  async generateIllustration(payload) {
+    const res = await apiClient.post('/illustrations/generate', payload);
+    return res.data.data;
+  },
+
+  async regenerateIllustration(id) {
+    const res = await apiClient.post(`/illustrations/${id}/regenerate`);
+    return res.data.data;
+  },
+
+  async batchIllustrations(payload) {
+    const res = await apiClient.post('/illustrations/batch', payload);
+    return res.data;
   },
 
   // Admin

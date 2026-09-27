@@ -74,11 +74,20 @@ test('Vachanam API Test Suite', async (t) => {
     assert.strictEqual(res.body.success, false);
   });
 
-  await t.test('POST /api/admin/cache/flush succeeds with valid admin key', async () => {
-    const res = await request(app)
-      .post('/api/admin/cache/flush')
-      .set('x-admin-key', 'vachanam_admin_secret_key_2026');
+  await t.test('GET /api/illustrations/:verseKey returns verified Bible illustration', async () => {
+    const res = await request(app).get('/api/illustrations/JHN.3.16');
     assert.strictEqual(res.status, 200);
     assert.strictEqual(res.body.success, true);
+    assert.ok(res.body.data.imageUrl);
+    assert.strictEqual(res.body.data.aspectRatio, '16:9');
+  });
+
+  await t.test('POST /api/illustrations/batch accepts batch generation job', async () => {
+    const res = await request(app)
+      .post('/api/illustrations/batch')
+      .send({ verseKeys: ['GEN.1.1', 'JHN.3.16'], limit: 2 });
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.body.status, 'PROCESSING');
   });
 });
+

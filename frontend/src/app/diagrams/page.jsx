@@ -47,17 +47,17 @@ export default function DiagramsPage() {
   });
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 min-h-screen pb-32">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 min-h-screen pb-32 bg-white">
       {/* Header */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-gold-100 dark:bg-gold-950 text-xs font-semibold text-gold-900 dark:text-gold-200">
-          <Sparkles className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-gold-50 border border-gold-200 text-xs font-semibold text-gold-900">
+          <Sparkles className="w-3.5 h-3.5 text-gold-600" />
           <span>Visual Theology Explorer</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-foreground">
+        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#163A5F]">
           {t('diagrams')}
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-[#525252]">
           Interactive timelines, mindmaps, character relationship graphs, and theological flowcharts
         </p>
       </div>
@@ -70,8 +70,8 @@ export default function DiagramsPage() {
             onClick={() => setSelectedType(tp.id)}
             className={`px-4 py-2 text-xs font-semibold rounded-2xl border transition-all ${
               selectedType === tp.id
-                ? 'bg-primary-900 text-white dark:bg-gold-400 dark:text-primary-950 border-transparent shadow-md'
-                : 'bg-card border-border hover:bg-muted text-muted-foreground'
+                ? 'bg-[#163A5F] text-white border-transparent shadow-sm font-bold'
+                : 'bg-white border-[#E5E7EB] hover:bg-slate-50 text-[#525252]'
             }`}
           >
             {tp.label}
@@ -83,7 +83,7 @@ export default function DiagramsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Left: Diagram List Navigation */}
         <div className="space-y-3">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-[#737373]">
             Available Models ({filtered.length})
           </h3>
           <div className="space-y-2">
@@ -97,17 +97,17 @@ export default function DiagramsPage() {
                   onClick={() => setActiveDiagram(item)}
                   className={`p-4 rounded-2xl border cursor-pointer transition-all ${
                     isSelected
-                      ? 'bg-primary-900/10 dark:bg-gold-400/10 border-gold-400 shadow-md font-bold'
-                      : 'bg-card border-border hover:border-gold-300'
+                      ? 'bg-[#EFF6FF] border-[#2563EB] shadow-sm font-bold'
+                      : 'bg-white border-[#E5E7EB] hover:border-gold-400'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <Badge variant={isSelected ? 'gold' : 'outline'} className="text-[10px] uppercase font-bold">
                       {item.type}
                     </Badge>
-                    <span className="text-xs font-mono text-muted-foreground">{item.bookCode}</span>
+                    <span className="text-xs font-mono text-[#737373]">{item.bookCode}</span>
                   </div>
-                  <h4 className="font-serif text-sm text-foreground mt-2">{title}</h4>
+                  <h4 className="font-serif text-sm text-[#171717] mt-2">{title}</h4>
                 </div>
               );
             })}
@@ -119,7 +119,7 @@ export default function DiagramsPage() {
           {activeDiagram ? (
             <InteractiveDiagram diagram={activeDiagram} />
           ) : (
-            <div className="p-12 text-center text-muted-foreground">
+            <div className="p-12 text-center text-[#737373]">
               Select a diagram from the list to explore.
             </div>
           )}

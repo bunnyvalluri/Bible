@@ -51,9 +51,7 @@ const TRANSLATIONS = {
     popular_searches: 'Popular Searches',
     recent_searches: 'Recent Searches',
     font_size: 'Font Size',
-    theme: 'Theme',
-    light: 'Light Cream',
-    dark: 'Night Navy',
+    reading_preferences: 'Reading Preferences',
     offline_ready: 'Available Offline',
     sync_online: 'Synchronized with Cloud'
   },
@@ -105,9 +103,7 @@ const TRANSLATIONS = {
     popular_searches: 'ప్రముఖ శోధనలు',
     recent_searches: 'ఇటీవలి శోధనలు',
     font_size: 'అక్షరాల పరిమాణం',
-    theme: 'థీమ్',
-    light: 'ప్రాచీన కాగితం (లైట్)',
-    dark: 'రాత్రి సమయం (డార్క్)',
+    reading_preferences: 'పఠన ప్రాధాన్యతలు',
     offline_ready: 'ఆఫ్‌లైన్‌లో అందుబాటులో ఉంది',
     sync_online: 'క్లౌడ్‌తో అనుసంధానించబడింది'
   },
@@ -159,9 +155,7 @@ const TRANSLATIONS = {
     popular_searches: 'लोकप्रिय खोजें',
     recent_searches: 'हाल की खोजें',
     font_size: 'फ़ॉन्ट आकार',
-    theme: 'थीम',
-    light: 'प्राचीन पृष्ठ (लाइट)',
-    dark: 'रात्रि शैली (डार्क)',
+    reading_preferences: 'पठन प्राथमिकताएं',
     offline_ready: 'ऑफ़लाइन उपलब्ध',
     sync_online: 'क्लाउड से जुड़ा हुआ'
   }

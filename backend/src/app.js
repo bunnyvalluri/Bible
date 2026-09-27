@@ -19,6 +19,7 @@ const audioRouter = require('./routes/audio');
 const imagesRouter = require('./routes/images');
 const plansRouter = require('./routes/plans');
 const adminRouter = require('./routes/admin');
+const illustrationsRouter = require('./routes/illustrationRoutes');
 
 const app = express();
 
@@ -84,6 +85,7 @@ app.use('/api/diagrams', diagramsRouter);
 app.use('/api/audio', audioRouter);
 app.use('/api/images', imagesRouter);
 app.use('/api/plans', plansRouter);
+app.use('/api/illustrations', illustrationsRouter);
 app.use('/api/admin', adminRouter);
 
 // 404 Handler

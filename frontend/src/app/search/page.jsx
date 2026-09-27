@@ -80,13 +80,13 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 min-h-screen pb-32">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 min-h-screen pb-32 bg-white">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-foreground">
+        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#163A5F]">
           {t('search')}
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-[#525252]">
           Search scripture across Telugu (తెలుగు), English, and Hindi (हिंदी)
         </p>
       </div>
@@ -94,27 +94,27 @@ export default function SearchPage() {
       {/* Main Search Input Bar */}
       <div className="relative max-w-3xl mx-auto">
         <div className="relative flex items-center">
-          <SearchIcon className="absolute left-4 w-5 h-5 text-gold-500" />
+          <SearchIcon className="absolute left-4 w-5 h-5 text-gold-600" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t('search_placeholder')}
-            className="w-full pl-12 pr-28 py-4 bg-card border-2 border-border focus:border-gold-400 rounded-2xl text-base text-foreground shadow-lg focus:outline-none transition-all"
+            className="w-full pl-12 pr-28 py-4 bg-white border-2 border-[#E5E7EB] focus:border-[#2563EB] rounded-2xl text-base text-[#171717] shadow-sm focus:outline-none transition-all"
           />
           {query && (
             <button
               onClick={clearSearch}
-              className="absolute right-24 text-muted-foreground hover:text-foreground p-1"
+              className="absolute right-24 text-[#737373] hover:text-[#171717] p-1"
             >
               <X className="w-4 h-4" />
             </button>
           )}
           <Button
-            variant="gold"
+            variant="default"
             size="default"
-            className="absolute right-2.5 h-10 px-4 rounded-xl"
+            className="absolute right-2.5 h-10 px-4 rounded-xl bg-[#163A5F] hover:bg-[#0f2842] text-white"
             onClick={() => handleSearch()}
             disabled={loading}
           >
@@ -132,7 +132,7 @@ export default function SearchPage() {
             setSearchLang(e.target.value);
             if (query) handleSearch();
           }}
-          className="bg-card border border-border rounded-xl px-3 py-1.5 font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-gold-400"
+          className="bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 font-medium text-[#171717] focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm"
         >
           <option value="all">All Languages</option>
           <option value="te">తెలుగు (Telugu)</option>
@@ -147,7 +147,7 @@ export default function SearchPage() {
             setSelectedTestament(e.target.value);
             if (query) handleSearch();
           }}
-          className="bg-card border border-border rounded-xl px-3 py-1.5 font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-gold-400"
+          className="bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 font-medium text-[#171717] focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm"
         >
           <option value="">Both Testaments</option>
           <option value="OT">Old Testament (పాత నిబంధన)</option>
@@ -161,7 +161,7 @@ export default function SearchPage() {
             setSelectedBook(e.target.value);
             if (query) handleSearch();
           }}
-          className="bg-card border border-border rounded-xl px-3 py-1.5 font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-gold-400"
+          className="bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 font-medium text-[#171717] focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm"
         >
           <option value="">All 66 Books</option>
           {BIBLE_BOOKS.map(b => (
@@ -177,8 +177,8 @@ export default function SearchPage() {
         <div className="max-w-2xl mx-auto space-y-6 pt-4">
           {/* Popular */}
           <div className="space-y-2">
-            <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              <TrendingUp className="w-3.5 h-3.5 text-gold-500" />
+            <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-[#737373]">
+              <TrendingUp className="w-3.5 h-3.5 text-gold-600" />
               <span>{t('popular_searches')}</span>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -189,7 +189,7 @@ export default function SearchPage() {
                     setQuery(p.query);
                     handleSearch(p.query);
                   }}
-                  className="px-3 py-1.5 rounded-xl bg-card border border-border hover:border-gold-400 text-xs text-foreground font-medium transition-colors shadow-sm"
+                  className="px-3 py-1.5 rounded-xl bg-white border border-[#E5E7EB] hover:border-gold-400 text-xs text-[#171717] font-medium transition-colors shadow-sm"
                 >
                   {p.text}
                 </button>
@@ -199,9 +199,9 @@ export default function SearchPage() {
 
           {/* Recent */}
           {recentSearches.length > 0 && (
-            <div className="space-y-2 pt-2 border-t border-border">
-              <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                <Clock className="w-3.5 h-3.5" />
+            <div className="space-y-2 pt-2 border-t border-[#E5E7EB]">
+              <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-[#737373]">
+                <Clock className="w-3.5 h-3.5 text-[#163A5F]" />
                 <span>{t('recent_searches')}</span>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -212,7 +212,7 @@ export default function SearchPage() {
                       setQuery(qText);
                       handleSearch(qText);
                     }}
-                    className="px-3 py-1.5 rounded-xl bg-muted/60 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    className="px-3 py-1.5 rounded-xl bg-[#F8FAFC] border border-[#E5E7EB] text-xs text-[#525252] hover:text-[#171717] transition-colors"
                   >
                     {qText}
                   </button>
@@ -225,7 +225,7 @@ export default function SearchPage() {
 
       {/* Results Header */}
       {results.length > 0 && (
-        <div className="flex items-center justify-between border-b border-border pb-2 text-xs text-muted-foreground">
+        <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2 text-xs text-[#737373]">
           <span>Found {total} matching verses</span>
           <span>Showing top results</span>
         </div>
@@ -239,12 +239,12 @@ export default function SearchPage() {
             href={`/reader?book=${item.bookCode}&chapter=${item.chapterNumber}`}
             className="block group"
           >
-            <Card className="p-5 rounded-2xl hover:border-gold-400 hover:shadow-md transition-all space-y-3 bg-card">
+            <Card className="p-5 rounded-2xl border-[#E5E7EB] hover:border-blue-400 hover:shadow-md transition-all space-y-3 bg-white">
               <div className="flex items-center justify-between">
-                <span className="font-serif font-bold text-sm text-gold-600 dark:text-gold-400 group-hover:underline">
+                <span className="font-serif font-bold text-sm text-[#163A5F] group-hover:underline">
                   {language === 'te' ? item.referenceTelugu : language === 'hi' ? item.referenceHindi : item.reference}
                 </span>
-                <Badge variant="outline" className="text-[10px]">
+                <Badge variant="outline" className="text-[10px] bg-[#F8FAFC] text-[#525252] border-[#E5E7EB]">
                   {item.bookCode} {item.chapterNumber}:{item.verseNumber}
                 </Badge>
               </div>
@@ -252,22 +252,22 @@ export default function SearchPage() {
               {/* Multilingual Text Snippets */}
               <div className="space-y-1.5 text-sm">
                 {item.textTelugu && (
-                  <p className="font-telugu text-foreground/90 leading-relaxed">
-                    <span className="text-[10px] uppercase font-bold text-muted-foreground mr-1.5 font-sans">TE:</span>
+                  <p className="font-telugu text-[#171717] leading-relaxed">
+                    <span className="text-[10px] uppercase font-bold text-[#737373] mr-1.5 font-sans">TE:</span>
                     {item.textTelugu}
                   </p>
                 )}
                 {item.textEnglish && (
-                  <p className="font-serif text-muted-foreground leading-relaxed">
-                    <span className="text-[10px] uppercase font-bold text-muted-foreground mr-1.5 font-sans">EN:</span>
+                  <p className="font-serif text-[#525252] leading-relaxed">
+                    <span className="text-[10px] uppercase font-bold text-[#737373] mr-1.5 font-sans">EN:</span>
                     {item.textEnglish}
                   </p>
                 )}
               </div>
 
-              <div className="flex items-center justify-end text-xs text-gold-600 dark:text-gold-400 font-medium group-hover:translate-x-1 transition-transform">
+              <div className="flex items-center justify-end text-xs text-gold-600 font-medium group-hover:translate-x-1 transition-transform">
                 <span>Read Full Chapter</span>
-                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                <ArrowRight className="w-3.5 h-3.5 ml-1 text-[#163A5F]" />
               </div>
             </Card>
           </Link>

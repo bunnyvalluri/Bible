@@ -22,13 +22,6 @@ export function VerseView({
     xl: 'text-2xl leading-loose'
   };
 
-  const fontFamilies = {
-    serif: 'font-serif',
-    sans: 'font-sans',
-    telugu: 'font-telugu',
-    devanagari: 'font-devanagari'
-  };
-
   const getHighlightClass = (verseKey) => {
     const colorId = highlights[verseKey];
     if (!colorId) return '';
@@ -37,7 +30,7 @@ export function VerseView({
   };
 
   return (
-    <div className={`space-y-4 max-w-3xl mx-auto ${fontSizes[fontSize] || fontSizes.md}`}>
+    <div className={`space-y-4 max-w-3xl mx-auto text-[#171717] ${fontSizes[fontSize] || fontSizes.md}`}>
       {verses.map((verse, idx) => {
         const text = language === 'te' ? verse.textTelugu : language === 'hi' ? verse.textHindi : verse.textEnglish;
         const isFirstVerse = verse.verseNumber === 1;
@@ -47,16 +40,16 @@ export function VerseView({
           <span
             key={verse.id || verse.verseKey || idx}
             onClick={() => onSelectVerse(verse)}
-            className={`inline group cursor-pointer rounded-lg px-1 py-0.5 transition-colors hover:bg-gold-100/60 dark:hover:bg-gold-950/40 ${hlClass}`}
+            className={`inline group cursor-pointer rounded-lg px-1 py-0.5 transition-colors hover:bg-[#FEFCE8] ${hlClass}`}
           >
             {/* Verse Number Indicator */}
-            <sup className="verse-num font-bold text-xs text-gold-600 dark:text-gold-400 select-none mr-1.5 group-hover:underline">
+            <sup className="verse-num font-bold text-xs text-[#163A5F] select-none mr-1.5 group-hover:underline">
               {verse.verseNumber}
             </sup>
 
             {/* Drop Cap for Verse 1 in Book Mode */}
             {isFirstVerse ? (
-              <span className="first-letter:text-4xl first-letter:font-serif first-letter:font-bold first-letter:text-primary-900 dark:first-letter:text-gold-300 first-letter:float-left first-letter:mr-2 first-letter:leading-none">
+              <span className="first-letter:text-4xl first-letter:font-serif first-letter:font-bold first-letter:text-[#163A5F] first-letter:float-left first-letter:mr-2 first-letter:leading-none">
                 {text}
               </span>
             ) : (
