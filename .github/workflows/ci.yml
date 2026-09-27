@@ -9,6 +9,10 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "file:./database/dev.db"
+      NODE_ENV: test
+      ADMIN_API_KEY: "vachanam_admin_secret_key_2026"
 
     steps:
     - name: Checkout Repository
@@ -23,8 +27,11 @@ jobs:
     - name: Install Monorepo Dependencies
       run: npm install
 
-    - name: Generate Prisma Engine
-      run: npx prisma generate --schema=database/schema.prisma
+    - name: Generate Prisma Engine & Initialize Database
+      run: |
+        npx prisma generate --schema=database/schema.prisma
+        npx prisma db push --schema=database/schema.prisma
+        node scripts/importBible.js
 
     - name: Run Server API Tests
       run: npm test
