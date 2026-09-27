@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@vachanam/shared": ["../shared/index.js"],
+      "@vachanam/shared/*": ["../shared/*"]
+    }
+  }
+}

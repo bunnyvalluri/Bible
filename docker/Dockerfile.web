@@ -1,0 +1,28 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY shared/package*.json ./shared/
+COPY frontend/package*.json ./frontend/
+
+RUN npm install --workspace=shared --workspace=frontend
+
+COPY shared ./shared/
+COPY frontend ./frontend/
+
+WORKDIR /app/frontend
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/shared ./shared
+COPY --from=builder /app/frontend ./frontend
+
+WORKDIR /app/frontend
+EXPOSE 3000
+
+CMD ["npm", "start"]

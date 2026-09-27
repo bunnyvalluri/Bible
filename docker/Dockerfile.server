@@ -1,0 +1,23 @@
+FROM node:20-alpine AS base
+
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+COPY shared/package*.json ./shared/
+COPY backend/package*.json ./backend/
+COPY database ./database/
+
+RUN npm install --workspace=shared --workspace=backend
+
+# Copy code
+COPY shared ./shared/
+COPY backend ./backend/
+COPY scripts ./scripts/
+
+# Generate Prisma Client
+RUN npx prisma generate --schema=database/schema.prisma
+
+EXPOSE 5000
+
+CMD ["node", "backend/src/index.js"]

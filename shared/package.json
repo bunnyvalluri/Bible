@@ -1,0 +1,11 @@
+{
+  "name": "@vachanam/shared",
+  "version": "1.0.0",
+  "main": "index.js",
+  "module": "index.mjs",
+  "exports": {
+    "import": "./index.mjs",
+    "require": "./index.js"
+  },
+  "private": true
+}

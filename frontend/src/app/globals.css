@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 25% 97%; /* #faf7f2 warm cream */
+    --foreground: 224 71% 8%; /* #0c1a38 deep navy */
+
+    --card: 0 0% 100%;
+    --card-foreground: 224 71% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71% 8%;
+
+    --primary: 224 71% 14%; /* Deep Royal Navy */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 42 63% 53%; /* Gold #d4af37 */
+    --secondary-foreground: 224 71% 10%;
+
+    --muted: 38 20% 92%;
+    --muted-foreground: 220 15% 45%;
+
+    --accent: 42 63% 92%;
+    --accent-foreground: 42 70% 25%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 38 20% 88%;
+    --input: 38 20% 88%;
+    --ring: 42 63% 53%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 224 71% 6%; /* #070e20 night navy */
+    --foreground: 40 20% 95%;
+
+    --card: 224 60% 9%;
+    --card-foreground: 40 20% 95%;
+
+    --popover: 224 60% 9%;
+    --popover-foreground: 40 20% 95%;
+
+    --primary: 42 63% 53%; /* Gold accent in dark mode */
+    --primary-foreground: 224 71% 8%;
+
+    --secondary: 224 50% 18%;
+    --secondary-foreground: 40 20% 95%;
+
+    --muted: 224 50% 14%;
+    --muted-foreground: 220 15% 65%;
+
+    --accent: 224 50% 16%;
+    --accent-foreground: 42 63% 65%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 224 50% 16%;
+    --input: 224 50% 16%;
+    --ring: 42 63% 53%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-gold-300 selection:text-primary-900;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/40 transition-colors;
+}
+
+/* Book Paper Texture & Aesthetics */
+.book-paper {
+  background-color: #faf7f2;
+  box-shadow: 
+    0 1px 3px rgba(0,0,0,0.05),
+    0 10px 25px -5px rgba(12,26,56,0.08),
+    inset 0 0 40px rgba(212,175,55,0.03);
+}
+
+.dark .book-paper {
+  background-color: #0b1329;
+  box-shadow: 
+    0 1px 3px rgba(0,0,0,0.4),
+    0 10px 25px -5px rgba(0,0,0,0.6),
+    inset 0 0 40px rgba(212,175,55,0.02);
+}
+
+/* Gold Gradient Text */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #e4c158 0%, #d4af37 50%, #9f751c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glassmorphism */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.dark .glass-panel {
+  background: rgba(11, 19, 41, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.12);
+}
+
+/* Verse Number Badge */
+.verse-num {
+  font-family: 'Inter', sans-serif;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,201 @@
+// Prisma Schema for Vachanam Multilingual Bible Engine
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Book {
+  id            Int       @id
+  code          String    @unique // e.g. GEN, MAT, PSA
+  shortCode     String    // e.g. Gen, Matt, Ps
+  english       String
+  telugu        String
+  hindi         String
+  testament     String    // OT or NT
+  chaptersCount Int
+  category      String    // Law, History, Poetry, Gospels, etc.
+  orderIndex    Int       @default(0)
+
+  chapters      Chapter[]
+  verses        Verse[]
+
+  @@index([code])
+  @@index([testament])
+}
+
+model Chapter {
+  id            Int      @id @default(autoincrement())
+  bookId        Int
+  chapterNumber Int
+  totalVerses   Int      @default(0)
+
+  book          Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  verses        Verse[]
+  audios        Audio[]
+
+  @@unique([bookId, chapterNumber])
+  @@index([bookId, chapterNumber])
+}
+
+model Verse {
+  id            Int           @id @default(autoincrement())
+  verseKey      String        @unique // e.g. GEN.1.1, JHN.3.16
+  bookId        Int
+  chapterId     Int?
+  chapterNumber Int
+  verseNumber   Int
+  textTelugu    String
+  textEnglish   String
+  textHindi     String
+
+  book          Book          @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  chapter       Chapter?      @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  explanations  Explanation[]
+  images        VerseImage[]
+  audios        Audio[]
+
+  @@index([bookId, chapterNumber, verseNumber])
+  @@index([verseKey])
+}
+
+model Explanation {
+  id                 Int      @id @default(autoincrement())
+  verseId            Int?
+  verseKey           String
+  language           String   // en, te, hi
+  simpleExplanation  String
+  keyPoints          String   // JSON array of 3 key learning points
+  historicalContext  String
+  spiritualMeaning   String
+  lifeApplication    String
+  youthExplanation   String
+  aiModel            String   @default("gpt-4o-mini")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  verse              Verse?   @relation(fields: [verseId], references: [id], onDelete: Cascade)
+
+  @@unique([verseKey, language])
+  @@index([verseKey])
+}
+
+model Diagram {
+  id          Int      @id @default(autoincrement())
+  diagramKey  String   @unique
+  bookCode    String
+  chapter     Int?
+  verses      String?
+  titleEn     String
+  titleTe     String?
+  titleHi     String?
+  type        String   // flowchart, timeline, relationship, infographic, mindmap, concept, journey
+  data        String   // JSON structured nodes & links
+  createdAt   DateTime @default(now())
+
+  @@index([bookCode])
+  @@index([type])
+}
+
+model VerseImage {
+  id              Int      @id @default(autoincrement())
+  verseId         Int?
+  verseKey        String
+  imageUrl        String
+  prompt          String
+  style           String   @default("biblical-oil-painting")
+  resolution      String   @default("1920x1080")
+  storageProvider String   @default("cloudinary") // cloudinary, s3, local
+  createdAt       DateTime @default(now())
+
+  verse           Verse?   @relation(fields: [verseId], references: [id], onDelete: Cascade)
+
+  @@index([verseKey])
+}
+
+model Audio {
+  id              Int      @id @default(autoincrement())
+  verseId         Int?
+  chapterId       Int?
+  verseKey        String?  // null for full chapter audio
+  language        String   // en, te, hi
+  audioUrl        String
+  durationSeconds Float    @default(0)
+  storageProvider String   @default("s3") // s3, gcs, local
+  createdAt       DateTime @default(now())
+
+  verse           Verse?   @relation(fields: [verseId], references: [id], onDelete: Cascade)
+  chapter         Chapter? @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@index([verseKey, language])
+  @@index([chapterId, language])
+}
+
+model DailyVerse {
+  id            Int      @id @default(autoincrement())
+  dateKey       String   @unique // YYYY-MM-DD
+  verseKey      String
+  reference     String   // e.g. John 3:16 / యోహాను 3:16
+  theme         String
+  verseTextEn   String
+  verseTextTe   String
+  verseTextHi   String
+  explanationEn String?
+  explanationTe String?
+  explanationHi String?
+  imageUrl      String?
+  audioUrl      String?
+  createdAt     DateTime @default(now())
+
+  @@index([dateKey])
+}
+
+model Bookmark {
+  id            String   @id @default(cuid())
+  verseKey      String
+  bookName      String
+  chapterNumber Int
+  verseNumber   Int
+  textPreview   String
+  language      String   @default("te")
+  createdAt     DateTime @default(now())
+
+  @@index([verseKey])
+}
+
+model Note {
+  id              String   @id @default(cuid())
+  verseKey        String
+  bookName        String
+  chapterNumber   Int
+  verseNumber     Int
+  contentMarkdown String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([verseKey])
+}
+
+model Highlight {
+  id        String   @id @default(cuid())
+  verseKey  String   @unique
+  color     String   @default("gold")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([verseKey])
+}
+
+model ReadingPlan {
+  id            String   @id
+  title         String
+  titleTelugu   String?
+  titleHindi    String?
+  durationDays  Int
+  category      String
+  description   String
+  createdAt     DateTime @default(now())
+}
