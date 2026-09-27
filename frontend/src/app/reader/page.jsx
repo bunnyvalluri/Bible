@@ -18,7 +18,11 @@ import {
   Maximize2,
   Copy,
   Layers,
-  ArrowLeft
+  ArrowLeft,
+  ChevronDown,
+  List,
+  AlignLeft,
+  Volume2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/card';
@@ -30,6 +34,7 @@ import { ReaderSettings } from '@/components/reader/ReaderSettings';
 import { VerseActionSheet } from '@/components/reader/VerseActionSheet';
 import { VerseExplanationDrawer } from '@/components/ai/VerseExplanationDrawer';
 import { BibleIllustrationModal } from '@/components/illustration/BibleIllustrationModal';
+import { BookPickerModal } from '@/components/reader/BookPickerModal';
 
 function ReaderContent() {
   const searchParams = useSearchParams();
@@ -44,11 +49,13 @@ function ReaderContent() {
   const [chapterData, setChapterData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Reader Settings State
+  // Layout & Settings
   const [readingMode, setReadingMode] = useState(READING_MODES.BOOK);
+  const [isVerseByVerse, setIsVerseByVerse] = useState(true);
   const [fontSize, setFontSize] = useState('md');
   const [fontFamily, setFontFamily] = useState('serif');
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [bookPickerOpen, setBookPickerOpen] = useState(false);
 
   // Selected Verse & Modals
   const [selectedVerse, setSelectedVerse] = useState(null);
@@ -81,7 +88,6 @@ function ReaderContent() {
       const book = BIBLE_BOOKS.find(b => b.code.toUpperCase() === code) || BIBLE_BOOKS[0];
       const bookName = language === 'te' ? book.telugu : language === 'hi' ? book.hindi : book.english;
 
-      // Track reading history
       addReadingHistory({
         bookCode: code,
         bookName,
@@ -106,8 +112,8 @@ function ReaderContent() {
   const handlePlayChapterAudio = () => {
     const bookName = language === 'te' ? currentBook.telugu : language === 'hi' ? currentBook.hindi : currentBook.english;
     playTrack({
-      title: `${bookName} - Chapter ${chapterNumber}`,
-      reference: `${currentBook.english} ${chapterNumber}`,
+      title: `${bookName} ${chapterNumber}`,
+      reference: `${currentBook.english} Chapter ${chapterNumber}`,
       audioUrl: 'https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3',
       duration: 180
     });
@@ -118,77 +124,68 @@ function ReaderContent() {
 
   return (
     <div className="min-h-screen bg-white pb-32">
-      {/* 1. Sticky Reader Header Toolbar */}
-      <div className="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-[#E5E7EB] py-3 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
-          {/* Book and Chapter Selectors */}
-          <div className="flex items-center space-x-2">
-            {/* Book Selector */}
-            <select
-              value={currentBook.code}
-              onChange={(e) => handleNavigateChapter(e.target.value, 1)}
-              className="bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-sm font-semibold text-[#171717] focus:outline-none focus:ring-2 focus:ring-blue-500 font-serif shadow-sm"
-            >
-              <optgroup label="Old Testament (పాత నిబంధన)">
-                {BIBLE_BOOKS.filter(b => b.testament === 'OT').map(b => (
-                  <option key={b.code} value={b.code}>
-                    {language === 'te' ? b.telugu : language === 'hi' ? b.hindi : b.english}
-                  </option>
-                ))}
-              </optgroup>
-              <optgroup label="New Testament (క్రొత్త నిబంధన)">
-                {BIBLE_BOOKS.filter(b => b.testament === 'NT').map(b => (
-                  <option key={b.code} value={b.code}>
-                    {language === 'te' ? b.telugu : language === 'hi' ? b.hindi : b.english}
-                  </option>
-                ))}
-              </optgroup>
-            </select>
+      {/* 1. Reader Navigation Toolbar */}
+      <div className="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-[#E5E7EB] py-3 px-3 sm:px-6 lg:px-8 shadow-sm">
+        <div className="max-w-5xl mx-auto flex items-center justify-between gap-2">
+          
+          {/* Quick Book & Chapter Picker Trigger Button */}
+          <button
+            onClick={() => setBookPickerOpen(true)}
+            className="flex items-center space-x-2 px-3.5 py-2 rounded-2xl bg-[#F8FAFC] hover:bg-[#163A5F]/10 border border-[#E5E7EB] text-[#163A5F] transition-all group shadow-sm"
+          >
+            <BookOpen className="w-4 h-4 text-gold-600 group-hover:scale-110 transition-transform" />
+            <span className="font-serif font-bold text-sm sm:text-base leading-none">
+              {bookName} {chapterNumber}
+            </span>
+            <ChevronDown className="w-4 h-4 text-[#737373] group-hover:translate-y-0.5 transition-transform" />
+          </button>
 
-            {/* Chapter Selector */}
-            <select
-              value={chapterNumber}
-              onChange={(e) => handleNavigateChapter(currentBook.code, parseInt(e.target.value, 10))}
-              className="bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-sm font-semibold text-[#171717] focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-            >
-              {Array.from({ length: currentBook.chapters }, (_, i) => i + 1).map(num => (
-                <option key={num} value={num}>
-                  {t('chapter')} {num}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Quick Actions: Audio, Modes, Settings */}
-          <div className="flex items-center space-x-1 sm:space-x-2">
+          {/* Quick Controls: Audio, View Mode, Font Settings */}
+          <div className="flex items-center space-x-1.5 sm:space-x-2">
+            {/* Audio narration button */}
             <Button
               variant="outline"
               size="sm"
-              className="h-9 px-2.5 sm:px-3 text-xs flex items-center space-x-1 border-[#E5E7EB] bg-white text-[#171717] hover:bg-slate-50"
+              className="h-9 px-2.5 sm:px-3.5 text-xs font-semibold rounded-xl border-[#E5E7EB] bg-white text-[#171717] hover:bg-[#F8FAFC] shadow-sm"
               onClick={handlePlayChapterAudio}
             >
-              <Headphones className="w-4 h-4 text-gold-600" />
+              <Volume2 className="w-4 h-4 mr-1 text-[#163A5F]" />
               <span className="hidden sm:inline">{t('listen')}</span>
             </Button>
 
+            {/* Verse-by-Verse / Paragraph toggle */}
             <Button
               variant="outline"
               size="sm"
-              className="h-9 px-2.5 sm:px-3 text-xs flex items-center space-x-1 border-[#E5E7EB] bg-white text-[#171717] hover:bg-slate-50"
-              onClick={() => setReadingMode(readingMode === READING_MODES.PARALLEL ? READING_MODES.BOOK : READING_MODES.PARALLEL)}
+              className="h-9 px-2.5 sm:px-3 text-xs font-semibold rounded-xl border-[#E5E7EB] bg-white text-[#171717] hover:bg-[#F8FAFC] shadow-sm"
+              onClick={() => setIsVerseByVerse(!isVerseByVerse)}
+              title={isVerseByVerse ? 'Switch to Paragraph Mode' : 'Switch to Verse-by-Verse Mode'}
             >
-              <Columns className="w-4 h-4 text-[#163A5F]" />
-              <span className="hidden sm:inline">
-                {readingMode === READING_MODES.PARALLEL ? 'Single View' : 'Parallel'}
-              </span>
+              {isVerseByVerse ? <List className="w-4 h-4 mr-1 text-[#163A5F]" /> : <AlignLeft className="w-4 h-4 mr-1 text-[#163A5F]" />}
+              <span className="hidden md:inline">{isVerseByVerse ? 'Verse Mode' : 'Book Mode'}</span>
             </Button>
 
+            {/* Parallel Mode Toggle */}
+            <Button
+              variant="outline"
+              size="sm"
+              className={`h-9 px-2.5 sm:px-3 text-xs font-semibold rounded-xl border-[#E5E7EB] shadow-sm ${
+                readingMode === READING_MODES.PARALLEL ? 'bg-[#163A5F] text-white' : 'bg-white text-[#171717] hover:bg-[#F8FAFC]'
+              }`}
+              onClick={() => setReadingMode(readingMode === READING_MODES.PARALLEL ? READING_MODES.BOOK : READING_MODES.PARALLEL)}
+            >
+              <Columns className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Parallel</span>
+            </Button>
+
+            {/* Reader Settings Modal Trigger */}
             <Button
               variant="outline"
               size="icon"
-              className="w-9 h-9 border-[#E5E7EB] bg-white text-[#171717] hover:bg-slate-50"
+              className="w-9 h-9 rounded-xl border-[#E5E7EB] bg-white text-[#171717] hover:bg-[#F8FAFC] shadow-sm"
               onClick={() => setSettingsOpen(true)}
               title="Reader Settings"
+              aria-label="Reader Settings"
             >
               <SlidersHorizontal className="w-4 h-4 text-[#163A5F]" />
             </Button>
@@ -196,27 +193,31 @@ function ReaderContent() {
         </div>
       </div>
 
-      {/* 2. Reader Book Paper Surface */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <div className="bg-white rounded-3xl p-6 sm:p-12 border border-[#E5E7EB] shadow-sm min-h-[600px] space-y-8 animate-in fade-in duration-300">
-          {/* Chapter Heading */}
-          <div className="text-center space-y-2 border-b border-[#E5E7EB] pb-6">
-            <span className="text-xs uppercase tracking-widest text-gold-600 font-serif font-semibold">
-              {currentBook.category} • {currentBook.testament === 'OT' ? t('ot') : t('nt')}
-            </span>
-            <h1 className="text-3xl sm:text-4xl font-bold font-serif text-[#163A5F]">
+      {/* 2. Reader Body */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+        <div className="bg-white rounded-3xl p-6 sm:p-12 border border-[#E5E7EB] shadow-sm space-y-10 min-h-[650px]">
+          {/* Chapter Title Header */}
+          <div className="text-center space-y-2.5 border-b border-[#E5E7EB] pb-8">
+            <div className="inline-flex items-center space-x-1.5 text-xs uppercase tracking-widest text-gold-700 font-mono font-bold">
+              <span>{currentBook.category}</span>
+              <span>•</span>
+              <span>{currentBook.testament === 'OT' ? t('ot') : t('nt')}</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-5xl font-bold font-serif text-[#163A5F] tracking-tight">
               {bookName} {chapterNumber}
             </h1>
-            <p className="text-xs text-[#737373] font-serif italic">
-              {currentBook.english} {chapterNumber} • {verses.length} Verses
+
+            <p className="text-xs sm:text-sm text-[#737373] font-serif">
+              {currentBook.english} Chapter {chapterNumber} • {verses.length} Verses
             </p>
           </div>
 
-          {/* Reading Mode Rendering */}
+          {/* Verses Content */}
           {loading ? (
-            <div className="py-24 text-center text-[#737373] text-sm space-y-2">
+            <div className="py-24 text-center text-[#737373] text-sm space-y-3">
               <div className="w-8 h-8 rounded-full border-2 border-gold-500 border-t-transparent animate-spin mx-auto" />
-              <p>Loading Scripture...</p>
+              <p className="font-medium">Loading Scripture...</p>
             </div>
           ) : readingMode === READING_MODES.PARALLEL ? (
             <ParallelVerseView
@@ -236,33 +237,37 @@ function ReaderContent() {
               highlights={highlights}
               fontSize={fontSize}
               fontFamily={fontFamily}
+              isVerseByVerse={isVerseByVerse}
             />
           )}
 
-          {/* 3. Bottom Chapter Navigation */}
+          {/* 3. Bottom Chapter Navigation Bar */}
           {chapterData?.navigation && (
-            <div className="flex items-center justify-between pt-8 border-t border-[#E5E7EB]">
+            <div className="flex items-center justify-between pt-8 border-t border-[#E5E7EB] gap-2">
               {chapterData.navigation.prev ? (
                 <Button
                   variant="outline"
-                  size="sm"
-                  className="rounded-xl flex items-center space-x-1 border-[#E5E7EB] bg-white text-[#171717] hover:bg-slate-50"
+                  size="default"
+                  className="rounded-2xl flex items-center space-x-2 border-[#E5E7EB] bg-white text-[#171717] hover:bg-[#F8FAFC] shadow-sm font-semibold text-xs sm:text-sm"
                   onClick={() => handleNavigateChapter(chapterData.navigation.prev.bookCode, chapterData.navigation.prev.chapterNumber)}
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-4 h-4 text-[#163A5F]" />
                   <span>{t('previous_chapter')}</span>
                 </Button>
               ) : <div />}
 
-              <span className="text-xs font-serif text-[#737373]">
+              <button
+                onClick={() => setBookPickerOpen(true)}
+                className="text-xs font-serif font-semibold text-[#163A5F] hover:underline px-3 py-1.5 rounded-lg hover:bg-slate-100"
+              >
                 {chapterNumber} of {currentBook.chapters}
-              </span>
+              </button>
 
               {chapterData.navigation.next ? (
                 <Button
                   variant="default"
-                  size="sm"
-                  className="rounded-xl flex items-center space-x-1 bg-[#163A5F] hover:bg-[#0f2842] text-white"
+                  size="default"
+                  className="rounded-2xl flex items-center space-x-2 bg-[#163A5F] hover:bg-[#0f2842] text-white shadow-md font-semibold text-xs sm:text-sm"
                   onClick={() => handleNavigateChapter(chapterData.navigation.next.bookCode, chapterData.navigation.next.chapterNumber)}
                 >
                   <span>{t('next_chapter')}</span>
@@ -273,6 +278,15 @@ function ReaderContent() {
           )}
         </div>
       </div>
+
+      {/* Book & Chapter Picker Modal */}
+      <BookPickerModal
+        isOpen={bookPickerOpen}
+        onClose={() => setBookPickerOpen(false)}
+        currentBookCode={currentBook.code}
+        currentChapter={chapterNumber}
+        onSelectChapter={handleNavigateChapter}
+      />
 
       {/* Focus Mode Overlay */}
       {readingMode === READING_MODES.FOCUS && (
