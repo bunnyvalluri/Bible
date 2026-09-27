@@ -127,11 +127,17 @@ describe('Vachanam Real-Time Systems Test Suite', () => {
       clientId: 'test-runner'
     });
 
-    await queueManager.processNextJob();
-
-    const completed = await prisma.asyncJob.findUnique({
+    let completed = await prisma.asyncJob.findUnique({
       where: { jobId: syncJob.jobId }
     });
+    let attempts = 0;
+    while (completed.status !== JOB_STATES.COMPLETED && attempts < 10) {
+      await queueManager.processNextJob();
+      completed = await prisma.asyncJob.findUnique({
+        where: { jobId: syncJob.jobId }
+      });
+      attempts++;
+    }
 
     assert.strictEqual(completed.status, JOB_STATES.COMPLETED);
     const parsedResult = JSON.parse(completed.result);

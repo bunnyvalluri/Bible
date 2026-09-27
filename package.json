@@ -19,7 +19,11 @@
     "db:push": "prisma db push --schema=database/schema.prisma",
     "db:seed": "node scripts/importBible.js",
     "test": "node --test backend/tests/*.test.js && node --test ai-engine/tests/*.test.js",
-    "test:ai": "node --test ai-engine/tests/*.test.js"
+    "test:ai": "node --test ai-engine/tests/*.test.js",
+    "image:service": "uvicorn services.image-generation.app.main:app --host 0.0.0.0 --port 8000",
+    "image:health": "node -e \"require('./backend/src/services/imageGenerationClient').getHealth().then(console.log)\"",
+    "illustrations:batch": "node -e \"require('./backend/src/controllers/illustrationController').batch({body:{limit:5}}, {json:console.log, status:()=>({json:console.log})})\"",
+    "illustrations:resume": "node -e \"require('./backend/src/controllers/illustrationController').generateBiblePipeline({body:{batchSize:10}}, {json:console.log, status:()=>({json:console.log})})\""
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

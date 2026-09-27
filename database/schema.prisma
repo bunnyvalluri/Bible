@@ -209,15 +209,23 @@ model Illustration {
   imageUrl           String
   thumbnailUrl       String?
   style              String                   @default("vachanam-editorial-handdrawn")
-  illustrationType   String                   @default("verse") // verse, story, concept, character, historical, youth
+  illustrationType   String                   @default("verse") // biblical_scene, symbolic, character, creation, landscape
   visualMetaphor     String?
   theme              String?
   prompt             String
+  negativePrompt     String?
+  provider           String                   @default("comfyui") // comfyui, diffusers, openai, fallback
   model              String                   @default("vachanam-visual-engine-v1")
-  status             String                   @default("COMPLETED") // PENDING, PROCESSING, COMPLETED, FAILED
+  seed               Int?
+  parameters         String?                  // JSON parameters (steps, cfg, sampler, etc.)
+  conceptJson        String?                  // Structured Visual Concept
+  status             String                   @default("COMPLETED") // PENDING, PROCESSING, COMPLETED, FAILED, REJECTED
+  qaStatus           String                   @default("PASSED") // PASSED, FAILED, NEEDS_REVIEW
   aspectRatio        String                   @default("16:9")
-  resolution         String                   @default("1920x1080")
+  resolution         String                   @default("1024x576")
   cloudinaryPublicId String?
+  promptVersion      String                   @default("1.0.0")
+  generationVersion  Int                      @default(1)
   createdAt          DateTime                 @default(now())
   updatedAt          DateTime                 @updatedAt
 
@@ -228,6 +236,7 @@ model Illustration {
   @@index([verseKey])
   @@index([illustrationType])
   @@index([language])
+  @@index([status])
 }
 
 model IllustrationGeneration {

@@ -12,8 +12,13 @@ services:
       - PORT=5000
       - DATABASE_URL=file:./database/dev.db
       - ADMIN_API_KEY=vachanam_admin_secret_key_2026
+      - REDIS_URL=redis://redis:6379
+      - IMAGE_SERVICE_URL=http://image-service:8000
     volumes:
       - ./database/dev.db:/app/database/dev.db
+    depends_on:
+      - redis
+      - image-service
 
   frontend:
     build:
@@ -26,3 +31,22 @@ services:
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
     depends_on:
       - backend
+
+  image-service:
+    build:
+      context: ./services/image-generation
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - IMAGE_PROVIDER=diffusers
+      - FALLBACK_IMAGE_PROVIDER=comfyui
+      - COMFYUI_URL=http://comfyui:8188
+      - PORT=8000
+    volumes:
+      - ./services/image-generation/generated_images:/app/generated_images
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"

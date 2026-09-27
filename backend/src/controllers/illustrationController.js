@@ -1,10 +1,8 @@
 const prisma = require('../config/db');
-const path = require('path');
-const {
-  defaultIllustrationEngine,
-  defaultContentAnalyzer,
-  defaultVisualMetaphorGenerator
-} = require(path.resolve(__dirname, '../../../ai-engine'));
+const imageClient = require('../services/imageGenerationClient');
+const { getQueueManager } = require('../queues/QueueManager');
+const broadcaster = require('../realtime/broadcaster');
+const { REALTIME_EVENTS } = require('@vachanam/shared');
 
 class IllustrationController {
   /**
@@ -18,8 +16,8 @@ class IllustrationController {
 
       // 1. Check existing illustration in DB
       let illustration = await prisma.illustration.findFirst({
-        where: { verseKey, language: lang, illustrationType: type },
-        include: { qaReviews: true }
+        where: { verseKey, language: lang },
+        include: { qaReviews: true, generations: true }
       });
 
       if (!illustration) {
@@ -29,28 +27,19 @@ class IllustrationController {
           include: { book: true }
         });
 
-        let ref, text;
         if (verse) {
-          ref = `${verse.book.english} ${verse.chapterNumber}:${verse.verseNumber}`;
-          text = lang === 'te' ? verse.textTelugu : lang === 'hi' ? verse.textHindi : verse.textEnglish;
-        } else {
-          const parts = verseKey.split('.');
-          const bookCode = parts[0] || 'JHN';
-          const ch = parts[1] || '1';
-          const v = parts[2] || '1';
-          ref = `${bookCode} ${ch}:${v}`;
-          text = 'For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.';
+          const genResult = await imageClient.generateVerseIllustration({
+            verseKey,
+            bookCode: verse.book.code,
+            bookName: verse.book.english,
+            chapter: verse.chapterNumber,
+            verseNumber: verse.verseNumber,
+            verseText: verse.textEnglish,
+            language: lang,
+            style: 'vachanam-editorial-handdrawn'
+          });
+          illustration = genResult.illustration;
         }
-
-        // Generate via Illustration Engine
-        illustration = await defaultIllustrationEngine.generateIllustration({
-          verseKey,
-          reference: ref,
-          text,
-          language: lang,
-          illustrationType: type,
-          prisma
-        });
       }
 
       return res.json({
@@ -58,7 +47,7 @@ class IllustrationController {
         data: illustration
       });
     } catch (err) {
-      console.error('Error fetching/generating illustration:', err);
+      console.error('Error fetching illustration:', err);
       return res.status(500).json({ success: false, error: err.message });
     }
   }
@@ -68,26 +57,292 @@ class IllustrationController {
    */
   async generate(req, res) {
     try {
-      const { verseKey, reference, text, language = 'en', type = 'verse', style } = req.body;
+      const {
+        verseKey,
+        style = 'vachanam-editorial-handdrawn',
+        language = 'en',
+        qualityMode = 'STANDARD',
+        provider = null,
+        forceRegenerate = false
+      } = req.body;
 
       if (!verseKey) {
         return res.status(400).json({ success: false, error: 'verseKey is required' });
       }
 
-      const result = await defaultIllustrationEngine.generateIllustration({
+      const verse = await prisma.verse.findUnique({
+        where: { verseKey },
+        include: { book: true }
+      });
+
+      if (!verse) {
+        return res.status(404).json({ success: false, error: `Verse not found: ${verseKey}` });
+      }
+
+      const result = await imageClient.generateVerseIllustration({
         verseKey,
-        reference: reference || verseKey,
-        text: text || 'God’s Holy Word',
+        bookCode: verse.book.code,
+        bookName: verse.book.english,
+        chapter: verse.chapterNumber,
+        verseNumber: verse.verseNumber,
+        verseText: verse.textEnglish,
         language,
-        illustrationType: type,
         style,
-        prisma
+        qualityMode,
+        provider,
+        forceRegenerate
       });
 
       return res.status(201).json({
         success: true,
-        data: result
+        data: result.illustration,
+        fromCache: result.fromCache
       });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  /**
+   * POST /api/illustrations/chapter/:bookCode/:chapterNumber
+   * Chapter Batch Image Generation
+   */
+  async generateChapterImages(req, res) {
+    try {
+      const { bookCode, chapterNumber } = req.params;
+      const { language = 'en', style = 'vachanam-editorial-handdrawn', qualityMode = 'STANDARD' } = req.body;
+
+      const chNum = parseInt(chapterNumber, 10);
+      const book = await prisma.book.findFirst({
+        where: { code: bookCode.toUpperCase() }
+      });
+
+      if (!book) {
+        return res.status(404).json({ success: false, error: 'Book not found' });
+      }
+
+      const verses = await prisma.verse.findMany({
+        where: { bookId: book.id, chapterNumber: chNum },
+        orderBy: { verseNumber: 'asc' }
+      });
+
+      const verseKeys = verses.map(v => v.verseKey);
+      const queueManager = getQueueManager(prisma);
+
+      const job = await queueManager.enqueueJob('illustration-batch', {
+        verseKeys,
+        language,
+        style,
+        qualityMode
+      }, {
+        idempotencyKey: `ch_img_${bookCode}_${chNum}_${language}`
+      });
+
+      return res.status(202).json({
+        success: true,
+        batchJobId: job.jobId,
+        bookCode,
+        chapterNumber: chNum,
+        totalVerses: verseKeys.length,
+        message: `Queued batch illustration generation for ${book.english} ${chNum} (${verseKeys.length} verses)`
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  /**
+   * POST /api/illustrations/book/:bookCode
+   * Book Batch Image Generation
+   */
+  async generateBookImages(req, res) {
+    try {
+      const { bookCode } = req.params;
+      const { language = 'en', startChapter = 1, endChapter = 999 } = req.body;
+
+      const book = await prisma.book.findFirst({
+        where: { code: bookCode.toUpperCase() }
+      });
+
+      if (!book) {
+        return res.status(404).json({ success: false, error: 'Book not found' });
+      }
+
+      const verses = await prisma.verse.findMany({
+        where: {
+          bookId: book.id,
+          chapterNumber: { gte: parseInt(startChapter, 10), lte: parseInt(endChapter, 10) }
+        },
+        orderBy: [{ chapterNumber: 'asc' }, { verseNumber: 'asc' }]
+      });
+
+      const verseKeys = verses.map(v => v.verseKey);
+      const queueManager = getQueueManager(prisma);
+
+      const job = await queueManager.enqueueJob('illustration-batch', {
+        verseKeys,
+        language
+      }, {
+        idempotencyKey: `book_img_${bookCode}_${startChapter}_${endChapter}`
+      });
+
+      return res.status(202).json({
+        success: true,
+        batchJobId: job.jobId,
+        bookCode,
+        totalVerses: verseKeys.length,
+        message: `Queued book illustration batch for ${book.english} (${verseKeys.length} verses)`
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  /**
+   * POST /api/illustrations/bible/resumable
+   * Resumable Full Bible Illustration Pipeline
+   */
+  async generateBiblePipeline(req, res) {
+    try {
+      const { language = 'en', batchSize = 50 } = req.body;
+
+      // Discover ungenerated verses
+      const existingIllustrations = await prisma.illustration.findMany({
+        where: { language, status: 'COMPLETED' },
+        select: { verseKey: true }
+      });
+
+      const completedSet = new Set(existingIllustrations.map(i => i.verseKey));
+
+      const pendingVerses = await prisma.verse.findMany({
+        select: { verseKey: true },
+        orderBy: [{ bookId: 'asc' }, { chapterNumber: 'asc' }, { verseNumber: 'asc' }]
+      });
+
+      const ungeneratedKeys = pendingVerses
+        .map(v => v.verseKey)
+        .filter(k => !completedSet.has(k))
+        .slice(0, parseInt(batchSize, 10));
+
+      const queueManager = getQueueManager(prisma);
+      const job = await queueManager.enqueueJob('illustration-batch', {
+        verseKeys: ungeneratedKeys,
+        language
+      }, {
+        idempotencyKey: `bible_pipeline_${Date.now()}`
+      });
+
+      return res.status(202).json({
+        success: true,
+        batchJobId: job.jobId,
+        totalRemaining: pendingVerses.length - completedSet.size,
+        currentBatchCount: ungeneratedKeys.length,
+        completedCount: completedSet.size
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  /**
+   * GET /api/illustrations/admin/list
+   * Admin filter & list
+   */
+  async adminList(req, res) {
+    try {
+      const { bookCode, status, provider, qaStatus, limit = 50, page = 1 } = req.query;
+      const take = parseInt(limit, 10);
+      const skip = (parseInt(page, 10) - 1) * take;
+
+      const where = {};
+      if (status) where.status = status;
+      if (provider) where.provider = provider;
+      if (qaStatus) where.qaStatus = qaStatus;
+      if (bookCode) {
+        where.verseKey = { startsWith: `${bookCode.toUpperCase()}.` };
+      }
+
+      const [items, total] = await Promise.all([
+        prisma.illustration.findMany({
+          where,
+          include: { qaReviews: true, generations: true, verse: { include: { book: true } } },
+          orderBy: { createdAt: 'desc' },
+          take,
+          skip
+        }),
+        prisma.illustration.count({ where })
+      ]);
+
+      return res.json({
+        success: true,
+        data: items,
+        pagination: {
+          total,
+          page: parseInt(page, 10),
+          limit: take,
+          totalPages: Math.ceil(total / take)
+        }
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  /**
+   * POST /api/illustrations/admin/:id/approve
+   */
+  async adminApprove(req, res) {
+    try {
+      const { id } = req.params;
+      const updated = await prisma.illustration.update({
+        where: { id: parseInt(id, 10) },
+        data: { status: 'COMPLETED', qaStatus: 'PASSED' }
+      });
+      return res.json({ success: true, data: updated });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  /**
+   * POST /api/illustrations/admin/:id/reject
+   */
+  async adminReject(req, res) {
+    try {
+      const { id } = req.params;
+      const { reason } = req.body;
+      const updated = await prisma.illustration.update({
+        where: { id: parseInt(id, 10) },
+        data: { status: 'REJECTED', qaStatus: 'FAILED' }
+      });
+      return res.json({ success: true, data: updated });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  /**
+   * DELETE /api/illustrations/admin/:id
+   */
+  async adminDelete(req, res) {
+    try {
+      const { id } = req.params;
+      await prisma.illustration.delete({
+        where: { id: parseInt(id, 10) }
+      });
+      return res.json({ success: true, message: 'Illustration metadata deleted' });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  /**
+   * GET /api/illustrations/health
+   */
+  async getHealth(req, res) {
+    try {
+      const health = await imageClient.getHealth();
+      return res.json({ success: true, data: health });
     } catch (err) {
       return res.status(500).json({ success: false, error: err.message });
     }
@@ -95,114 +350,26 @@ class IllustrationController {
 
   /**
    * POST /api/illustrations/batch
-   * Background batch generation
+   * Legacy simple batch compatibility
    */
   async batch(req, res) {
     try {
       const { verseKeys = [], limit = 10, language = 'en' } = req.body;
       const targetKeys = verseKeys.length > 0 ? verseKeys : ['GEN.1.1', 'JHN.3.16', 'PSA.23.1', 'PRO.3.5', 'ROM.8.28'].slice(0, limit);
 
-      const batchId = `batch_ill_${Date.now()}`;
-
-      // Trigger asynchronous background processing
-      setImmediate(async () => {
-        for (const vk of targetKeys) {
-          try {
-            const verse = await prisma.verse.findUnique({ where: { verseKey: vk }, include: { book: true } });
-            if (verse) {
-              const ref = `${verse.book.english} ${verse.chapterNumber}:${verse.verseNumber}`;
-              const text = language === 'te' ? verse.textTelugu : language === 'hi' ? verse.textHindi : verse.textEnglish;
-              await defaultIllustrationEngine.generateIllustration({
-                verseKey: vk,
-                reference: ref,
-                text,
-                language,
-                prisma
-              });
-            }
-          } catch (e) {
-            console.warn(`Batch item ${vk} failed:`, e.message);
-          }
-        }
+      const queueManager = getQueueManager(prisma);
+      const job = await queueManager.enqueueJob('illustration-batch', {
+        verseKeys: targetKeys,
+        language
       });
 
       return res.json({
         success: true,
-        batchId,
+        batchId: job.jobId,
         status: 'PROCESSING',
         totalItems: targetKeys.length,
         items: targetKeys
       });
-    } catch (err) {
-      return res.status(500).json({ success: false, error: err.message });
-    }
-  }
-
-  /**
-   * POST /api/illustrations/:id/regenerate
-   */
-  async regenerate(req, res) {
-    try {
-      const { id } = req.params;
-      const existing = await prisma.illustration.findUnique({ where: { id: parseInt(id, 10) } });
-      if (!existing) {
-        return res.status(404).json({ success: false, error: 'Illustration not found' });
-      }
-
-      const refreshed = await defaultIllustrationEngine.generateIllustration({
-        verseKey: existing.verseKey,
-        reference: existing.verseKey,
-        text: existing.theme || 'Scripture',
-        language: existing.language,
-        illustrationType: existing.illustrationType,
-        style: existing.style,
-        prisma
-      });
-
-      return res.json({ success: true, data: refreshed });
-    } catch (err) {
-      return res.status(500).json({ success: false, error: err.message });
-    }
-  }
-
-  /**
-   * GET /api/illustrations/:id/status
-   */
-  async getStatus(req, res) {
-    try {
-      const { id } = req.params;
-      const item = await prisma.illustration.findUnique({
-        where: { id: parseInt(id, 10) },
-        include: { qaReviews: true, generations: true }
-      });
-      if (!item) return res.status(404).json({ success: false, error: 'Illustration not found' });
-      return res.json({ success: true, data: item });
-    } catch (err) {
-      return res.status(500).json({ success: false, error: err.message });
-    }
-  }
-
-  /**
-   * POST /api/illustrations/:id/qa
-   */
-  async submitQA(req, res) {
-    try {
-      const { id } = req.params;
-      const { contentScore, styleScore, safetyScore, accuracyScore, approved, feedback } = req.body;
-
-      const qa = await prisma.illustrationQA.create({
-        data: {
-          illustrationId: parseInt(id, 10),
-          contentScore: contentScore ?? 1.0,
-          styleScore: styleScore ?? 1.0,
-          safetyScore: safetyScore ?? 1.0,
-          accuracyScore: accuracyScore ?? 1.0,
-          approved: approved ?? true,
-          feedback: feedback || 'Approved via QA audit'
-        }
-      });
-
-      return res.json({ success: true, data: qa });
     } catch (err) {
       return res.status(500).json({ success: false, error: err.message });
     }

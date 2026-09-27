@@ -94,9 +94,17 @@ function registerAllJobWorkers(queueManager, prisma) {
     return saved;
   });
 
-  // 2. Bible Visual Illustration Worker
+  // 2. Bible Visual Illustration Worker (ComfyUI / Diffusers + Fallback)
   queueManager.registerWorker('illustration', async (payload, progress, job) => {
-    const { verseKey, style = 'vachanam-editorial-handdrawn', language = 'en' } = payload;
+    const {
+      verseKey,
+      style = 'vachanam-editorial-handdrawn',
+      language = 'en',
+      qualityMode = 'STANDARD',
+      provider = null,
+      forceRegenerate = false
+    } = payload;
+
     progress.report(15, 'Analyzing Visual Metaphor', `Identifying key biblical themes for ${verseKey}`);
 
     const verse = await prisma.verse.findUnique({
@@ -108,56 +116,70 @@ function registerAllJobWorkers(queueManager, prisma) {
       throw new Error(`Verse not found for key: ${verseKey}`);
     }
 
-    progress.report(45, 'Generating Metaphor Composition', `Creating 16:9 hand-drawn editorial illustration prompt`);
+    progress.report(45, 'Synthesizing Visual Composition', `Dispatching to ${provider || 'configured AI pipeline'} (16:9 widescreen)`);
 
-    const engine = new IllustrationEngine();
-    const result = await engine.generateArtwork(verseKey, {
+    const imageClient = require('../services/imageGenerationClient');
+    const result = await imageClient.generateVerseIllustration({
+      verseKey,
       bookCode: verse.book.code,
       bookName: verse.book.english,
       chapter: verse.chapterNumber,
       verseNumber: verse.verseNumber,
       verseText: verse.textEnglish,
-      style
+      language,
+      style,
+      qualityMode,
+      provider,
+      forceRegenerate
     });
 
-    if (!result.success) {
-      throw new Error(result.error || 'Illustration generation failed');
+    progress.report(85, 'Visual Quality Assurance', 'Validating dimensions, composition, and contrast metrics');
+    progress.report(100, 'Completed', 'Sacred 16:9 illustration ready');
+
+    return result.illustration;
+  });
+
+  // 2.1 Batch Chapter / Book Illustration Worker
+  queueManager.registerWorker('illustration-batch', async (payload, progress, job) => {
+    const { verseKeys = [], language = 'en', style = 'vachanam-editorial-handdrawn', qualityMode = 'STANDARD' } = payload;
+    progress.report(5, 'Batch Initiated', `Starting generation for ${verseKeys.length} verses`);
+
+    const imageClient = require('../services/imageGenerationClient');
+    let completed = 0;
+    const results = [];
+
+    for (let i = 0; i < verseKeys.length; i++) {
+      const vKey = verseKeys[i];
+      try {
+        const verse = await prisma.verse.findUnique({
+          where: { verseKey: vKey },
+          include: { book: true }
+        });
+
+        if (verse) {
+          const res = await imageClient.generateVerseIllustration({
+            verseKey: vKey,
+            bookCode: verse.book.code,
+            bookName: verse.book.english,
+            chapter: verse.chapterNumber,
+            verseNumber: verse.verseNumber,
+            verseText: verse.textEnglish,
+            language,
+            style,
+            qualityMode
+          });
+          results.push({ verseKey: vKey, status: 'COMPLETED', illustration: res.illustration });
+          completed++;
+        }
+      } catch (err) {
+        results.push({ verseKey: vKey, status: 'FAILED', error: err.message });
+      }
+
+      const pct = Math.round(((i + 1) / verseKeys.length) * 100);
+      progress.report(pct, 'Processing Batch', `Completed ${completed} of ${verseKeys.length} illustrations`);
     }
 
-    progress.report(85, 'Visual Quality Assurance', 'Performing compositional verification & contrast checking');
-
-    const illustrationRecord = await prisma.$transaction(async (tx) => {
-      const record = await tx.illustration.create({
-        data: {
-          verseId: verse.id,
-          verseKey,
-          language,
-          imageUrl: result.imageUrl,
-          style,
-          illustrationType: 'verse',
-          visualMetaphor: result.visualMetaphor,
-          theme: result.theme,
-          prompt: result.prompt,
-          status: 'COMPLETED'
-        }
-      });
-
-      await outboxService.createOutboxEvent(tx, {
-        eventType: REALTIME_EVENTS.ILLUSTRATION_COMPLETED,
-        aggregateType: 'illustration',
-        aggregateId: verseKey,
-        payload: {
-          verseKey,
-          illustration: record
-        },
-        rooms: ['global', `verse:${verseKey}`]
-      });
-
-      return record;
-    });
-
-    progress.report(100, 'Completed', 'Illustration ready');
-    return illustrationRecord;
+    return { total: verseKeys.length, completed, results };
   });
 
   // 3. Audio Narration Worker

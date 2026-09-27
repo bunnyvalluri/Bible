@@ -133,6 +133,12 @@ export async function getHighlights() {
   return db.getAll('highlights');
 }
 
+export async function getHighlight(verseKey) {
+  const db = await getDB();
+  if (!db) return null;
+  return db.get('highlights', verseKey);
+}
+
 export async function setHighlight(verseKey, color) {
   const db = await getDB();
   if (!db) return;

@@ -67,7 +67,9 @@ class BibleService {
           orderBy: { verseNumber: 'asc' },
           include: {
             explanations: true,
-            images: true
+            images: true,
+            illustrations: true,
+            audios: true
           }
         },
         audios: true
@@ -92,6 +94,7 @@ class BibleService {
         chapter: true,
         explanations: true,
         images: true,
+        illustrations: true,
         audios: true
       }
     });

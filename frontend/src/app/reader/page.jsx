@@ -238,6 +238,7 @@ function ReaderContent() {
               fontSize={fontSize}
               fontFamily={fontFamily}
               isVerseByVerse={isVerseByVerse}
+              onRefreshChapter={() => loadChapter(currentBook.code, chapterNumber)}
             />
           )}
 
