@@ -61,7 +61,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-6 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between text-xs text-[#737373] space-y-4 sm:space-y-0">
-          <p>© {new Date().getFullYear()} Vachanam Bible Engine. Built for the glory of God.</p>
+          <p suppressHydrationWarning>© 2026 Vachanam Bible Engine. Built for the glory of God.</p>
           <div className="flex items-center space-x-4">
             <span className="flex items-center space-x-1">
               <Globe className="w-3.5 h-3.5 text-[#C9A227]" />

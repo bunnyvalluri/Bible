@@ -29,13 +29,13 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="te" className="light" style={{ colorScheme: 'light' }}>
+    <html lang="te" className="light" style={{ colorScheme: 'light' }} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body className="min-h-screen min-h-[100dvh] bg-white text-[#171717] flex flex-col font-sans antialiased selection:bg-gold-100 selection:text-primary-950 overflow-x-hidden">
+      <body className="min-h-screen min-h-[100dvh] bg-white text-[#171717] flex flex-col font-sans antialiased selection:bg-gold-100 selection:text-primary-950 overflow-x-hidden" suppressHydrationWarning>
         <ReactQueryProvider>
           <I18nProvider>
             <AudioProvider>
