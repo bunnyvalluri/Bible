@@ -74,6 +74,9 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+const { createRealtimeJobRoutes } = require('./routes/realtimeJobRoutes');
+const prisma = require('./config/db');
+
 // API Routes
 app.use('/api/books', booksRouter);
 app.use('/api/chapters', chaptersRouter);
@@ -86,6 +89,7 @@ app.use('/api/audio', audioRouter);
 app.use('/api/images', imagesRouter);
 app.use('/api/plans', plansRouter);
 app.use('/api/illustrations', illustrationsRouter);
+app.use('/api/jobs', createRealtimeJobRoutes(prisma));
 app.use('/api/admin', adminRouter);
 
 // 404 Handler

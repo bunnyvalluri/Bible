@@ -21,6 +21,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Button } from '../ui/button';
+import { ConnectionIndicator } from '../realtime/ConnectionIndicator';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -109,8 +110,8 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between h-16">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center space-x-2.5 sm:space-x-3 shrink-0 group">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#163A5F] flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-            <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-[#C9A227]" />
+          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm group-hover:scale-105 transition-transform border border-gold-300/40 bg-white flex items-center justify-center">
+            <img src="/logo.png" alt="Vachanam Logo" className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-base sm:text-lg leading-tight tracking-tight text-[#163A5F] font-serif whitespace-nowrap">
@@ -190,22 +191,10 @@ export function Navbar() {
           </div>
         </nav>
 
-        {/* Right Controls: Online Status & Language Switcher */}
+        {/* Right Controls: Real-Time Connection Status & Language Switcher */}
         <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
-          {/* Offline / Online indicator (desktop) */}
-          <div className="hidden sm:flex items-center space-x-1.5 text-xs px-2.5 py-1 rounded-full bg-[#F8FAFC] border border-[#E5E7EB] text-[#525252]" title={isOnline ? 'Online' : 'Offline PWA Active'}>
-            {isOnline ? (
-              <>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[11px] font-medium">Online</span>
-              </>
-            ) : (
-              <>
-                <WifiOff className="w-3.5 h-3.5 text-amber-500" />
-                <span className="text-[11px] font-medium text-amber-600">Offline</span>
-              </>
-            )}
-          </div>
+          {/* Real-time Connection Indicator */}
+          <ConnectionIndicator />
 
           {/* Language Switcher Pill */}
           <div className="flex items-center bg-[#F8FAFC] rounded-xl p-0.5 border border-[#E5E7EB] shadow-inner">

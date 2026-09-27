@@ -275,3 +275,60 @@ model IllustrationQA {
   @@index([illustrationId])
 }
 
+model OutboxEvent {
+  id            String    @id @default(cuid())
+  eventId       String    @unique
+  eventType     String    // e.g. ai.explanation.completed, bible.chapter.updated
+  aggregateType String    // e.g. explanation, verse, chapter, diagram, illustration
+  aggregateId   String    // e.g. GEN.1.1, JHN.3.16
+  payload       String    // JSON payload
+  status        String    @default("PENDING") // PENDING, PUBLISHED, FAILED
+  attempts      Int       @default(0)
+  createdAt     DateTime  @default(now())
+  processedAt   DateTime?
+  lastError     String?
+
+  @@index([status, createdAt])
+  @@index([aggregateType, aggregateId])
+}
+
+model AsyncJob {
+  id          String    @id @default(cuid())
+  jobId       String    @unique
+  type        String    // ai-explanation, ai-diagram, illustration, audio, search-index, daily-verse
+  status      String    @default("PENDING") // PENDING, QUEUED, RUNNING, PROCESSING, VALIDATING, COMPLETED, FAILED, RETRYING
+  progress    Int       @default(0) // 0-100
+  stage       String?   // e.g. "Analyzing context", "Generating explanation"
+  message     String?
+  metadata    String?   // JSON metadata (e.g. verseKey, language)
+  result      String?   // JSON result
+  error       String?
+  retryCount  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  @@index([type, status])
+  @@index([jobId])
+  @@index([createdAt])
+}
+
+model SyncQueueItem {
+  id          String    @id @default(cuid())
+  operationId String    @unique
+  clientId    String?
+  entityType  String    // bookmark, note, highlight, reading-progress
+  entityId    String
+  operation   String    // CREATE, UPDATE, DELETE
+  payload     String    // JSON payload
+  status      String    @default("PENDING") // PENDING, SYNCED, FAILED
+  retryCount  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  syncedAt    DateTime?
+  lastError   String?
+
+  @@index([status, createdAt])
+  @@index([clientId])
+}
+
+

@@ -15,8 +15,8 @@ export function Footer() {
           {/* Col 1: About */}
           <div className="space-y-4 md:col-span-2">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-lg bg-[#163A5F] flex items-center justify-center shadow-sm">
-                <BookOpen className="w-4 h-4 text-[#C9A227]" />
+              <div className="w-8 h-8 rounded-lg overflow-hidden shadow-sm border border-gold-300/40 bg-white flex items-center justify-center">
+                <img src="/logo.png" alt="Vachanam Emblem" className="w-full h-full object-cover" />
               </div>
               <span className="font-serif text-xl font-bold tracking-tight text-[#163A5F]">
                 వచనం • Vachanam • वचन
