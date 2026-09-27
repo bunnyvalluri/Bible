@@ -1,6 +1,6 @@
 // Prisma Schema for Vachanam Multilingual Bible Engine
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
